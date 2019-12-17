@@ -1,5 +1,5 @@
 function output = qdGenerator(dRayOutput, arrayOfMaterials,...
-    MaterialLibrary, freq, vRel)
+    materialLibrary)
 % output:
 % 1. reflection order
 % 2:4. DoD
@@ -17,14 +17,18 @@ function output = qdGenerator(dRayOutput, arrayOfMaterials,...
 % 20. phase (dopplerFactor*freq)
 % 21. 0 (?)
 
+if dRayOutput(1) == 0
+    % no diffused components for LoS ray
+    output = dRayOutput;
+    return;
+end
+
 % Add randomness to deterministic reflection loss
-dRayOutput(9) = getRandomPg0(dRayOutput, arrayOfMaterials, MaterialLibrary);
+dRayOutput(9) = getRandomPg0(dRayOutput, arrayOfMaterials, materialLibrary);
 
 % Pre/post cursors output
-outputPre = getQdOutput(dRayOutput, arrayOfMaterials, MaterialLibrary,...
-    freq, vRel, 'pre');
-outputPost = getQdOutput(dRayOutput, arrayOfMaterials, MaterialLibrary,...
-    freq, vRel, 'post');
+outputPre = getQdOutput(dRayOutput, arrayOfMaterials, materialLibrary, 'pre');
+outputPost = getQdOutput(dRayOutput, arrayOfMaterials, materialLibrary, 'post');
 
 output = [outputPre; dRayOutput; outputPost];
 
@@ -40,7 +44,10 @@ pg = dRayOutput(9);
 for i = 1:length(arrayOfMaterials)
     matIdx = arrayOfMaterials(i);
     
-    rl = MaterialLibrary.mu_RL(matIdx); % TODO: update with Rician RL
+    s_material = MaterialLibrary.s_RL(matIdx);
+    sigma_material = MaterialLibrary.sigma_RL(matIdx);
+    rl = rndRician(s_material, sigma_material, 1, 1);
+    
     muRl = MaterialLibrary.mu_RL(matIdx);
     pg = pg - (rl - muRl);
 end
@@ -48,50 +55,50 @@ end
 end
 
 
-function output = getQdOutput(dRayOutput, arrayOfMaterials, MaterialLibrary,...
-    freq, vRel, prePostParam)
+function output = getQdOutput(dRayOutput, arrayOfMaterials, MaterialLibrary, prePostParam)
 params = getParams(arrayOfMaterials, MaterialLibrary, prePostParam);
 
 % delays
-tau0 = dRayOutput(8); % main cursor's delay
+tau0 = dRayOutput(8); % main cursor's delay [s]
+pg0db = dRayOutput(9); % main cursor's path gain [dB]
+aodAzCursor = dRayOutput(10); % main cursor's AoD azimuth [deg]
+aodElCursor = dRayOutput(11); % main cursor's AoD elevation [deg]
+aoaAzCursor = dRayOutput(12); % main cursor's AoA azimuth [deg]
+aoaElCursor = dRayOutput(13); % main cursor's AoA elevation [deg]
 
-lambda = params.mul; % TODO: update with Rician distribution
+lambda = rndRician(params.s_lambda, params.sigma_lambda, 1, 1) * 1e9; % [1/s]
+
+if isnan(lambda) || lambda == 0
+    % No pre/post cursors
+    output = [];
+    return;
+end
+
 interArrivalTime = rndExp(lambda, params.nRays, 1); % [s]
-taus = tau0 + params.delayMultiplier*cumsum(interArrivalTime);
-% TODO: check if ray is arriving before LoS
+taus = tau0 + params.delayMultiplier*cumsum(interArrivalTime); % [s]
+% TODO: remove rays arriving before LoS
 
 % path gains
-Kdb = params.muk; % TODO: update with Rician distribution
-gamma = params.muy; % TODO: update with Rician distribution
-sigma_s = params.mus; % TODO: update with Rician distribution
+Kdb = rndRician(params.s_K, params.sigma_K, 1, 1); % [dB]
+gamma = rndRician(params.s_gamma, params.sigma_gamma, 1, 1) * 1e-9; % [s]
+sigma_s = rndRician(params.s_sigmaS, params.sigma_sigmaS, 1, 1); % [std.err in exp]
 
-s = randn(params.nRays, 1) * sigma_s; % TODO: check pre/post, check mus dB/lin
-pg = dRayOutput(9) - Kdb - abs(taus - tau0)/gamma + s;
-% in dB: pg = pgCursorDb - params.mukDb + 10*log10(exp(1)) * (exponent+s);
-% PROBLEM: to avoid diffused components to have more power than main
-% cursor, s < params.mukDb / (10*log10(exp(1))) - exponent
-% TODO: should the cursor's power be maintained while dividing it over the
-% diffused components?
+s = sigma_s * randn(params.nRays, 1);
+pg = pg0db - Kdb + 10*log10(exp(1)) * (-abs(taus - tau0)/gamma + s);
+% TODO: remove MPCs with more power than main cursor
 
 % angle spread
-aodAzCursor = dRayOutput(10);
-aodElCursor = dRayOutput(11);
-aoaAzCursor = dRayOutput(12);
-aoaElCursor = dRayOutput(13);
-
+aodAzimuthSpread = rndRician(params.s_sigmaAlphaAz, params.sigma_sigmaAlphaAz, 1, 1);
+aodElevationSpread = rndRician(params.s_sigmaAlphaEl, params.sigma_sigmaAlphaEl, 1, 1);
+aoaAzimuthSpread = rndRician(params.s_sigmaAlphaAz, params.sigma_sigmaAlphaAz, 1, 1);
+aoaElevationSpread = rndRician(params.s_sigmaAlphaEl, params.sigma_sigmaAlphaEl, 1, 1);
 [aodAz, aodEl] = getDiffusedAngles(aodAzCursor, aodElCursor,...
-    params.mus, params.nRays);
+    aodAzimuthSpread, aodElevationSpread, params.nRays);
 [aoaAz, aoaEl] = getDiffusedAngles(aoaAzCursor, aoaElCursor,...
-    params.mus, params.nRays);
-
-% doppler spread
-aoaDirections = azel2vec(aoaAz, aoaEl);
-vProjected = aoaDirections * vRel.'; % assuming vRel row vector. vRel should be the unwrapped relative velocity between the two nodes wrt to the Rx
-dopplerDeltaFreq = vProjected / 3e8 * freq;
+    aoaAzimuthSpread, aoaElevationSpread, params.nRays);
 
 % Combine results into output matrix
 % Copy D-ray outputs as some columns are repeated (e.g., reflection order)
-% TODO: use fillOutput
 output = repmat(dRayOutput, params.nRays, 1);
 % delay
 output(:,8) = taus;
@@ -106,9 +113,9 @@ output(:,12) = aoaAz;
 % AoA elevation
 output(:,13) = aoaEl;
 % phase
-output(:,18) = rand(params.nRays,1) * 2*pi;
-% doppler frequency shift
-output(:,20) = dopplerDeltaFreq;
+output(:,18) = rand(params.nRays, 1) * 2*pi;
+% doppler phase shift: uniformly random included in "phase" entry
+output(:,20) = 0;
 
 end
 
@@ -119,16 +126,26 @@ materialIdx = arrayOfMaterials(end); % QD based on last reflector
 
 switch(prePostParam)
     case 'pre'
-        params.muk = 10^(MaterialLibrary.mu_k_Precursor(materialIdx) / 10); % lin
-        params.muy = MaterialLibrary.mu_Y_Precursor(materialIdx) * 1e-9; % s
-        params.mul = MaterialLibrary.mu_lambda_Precursor(materialIdx) * 1e9; % 1/s
+        params.s_K = MaterialLibrary.s_K_Precursor(materialIdx);
+        params.sigma_K = MaterialLibrary.sigma_K_Precursor(materialIdx);
+        params.s_gamma = MaterialLibrary.s_gamma_Precursor(materialIdx);
+        params.sigma_gamma = MaterialLibrary.sigma_gamma_Precursor(materialIdx);
+        params.s_sigmaS = MaterialLibrary.s_sigmaS_Precursor(materialIdx);
+        params.sigma_sigmaS = MaterialLibrary.sigma_sigmaS_Precursor(materialIdx);
+        params.s_lambda = MaterialLibrary.s_lambda_Precursor(materialIdx);
+        params.sigma_lambda = MaterialLibrary.sigma_lambda_Precursor(materialIdx);
         params.delayMultiplier = -1;
         params.nRays = 3;
         
     case 'post'
-        params.muk = 10^(MaterialLibrary.mu_k_Postcursor(materialIdx) / 10); % lin
-        params.muy = MaterialLibrary.mu_Y_Postcursor(materialIdx) * 1e-9; % s
-        params.mul = MaterialLibrary.mu_lambda_Postcursor(materialIdx) * 1e9; % 1/s
+        params.s_K = MaterialLibrary.s_K_Postcursor(materialIdx);
+        params.sigma_K = MaterialLibrary.sigma_K_Postcursor(materialIdx);
+        params.s_gamma = MaterialLibrary.s_gamma_Postcursor(materialIdx);
+        params.sigma_gamma = MaterialLibrary.sigma_gamma_Postcursor(materialIdx);
+        params.s_sigmaS = MaterialLibrary.s_sigmaS_Postcursor(materialIdx);
+        params.sigma_sigmaS = MaterialLibrary.sigma_sigmaS_Postcursor(materialIdx);
+        params.s_lambda = MaterialLibrary.s_lambda_Postcursor(materialIdx);
+        params.sigma_lambda = MaterialLibrary.sigma_lambda_Postcursor(materialIdx);
         params.delayMultiplier = 1;
         params.nRays = 16;
         
@@ -136,15 +153,19 @@ switch(prePostParam)
         error('prePostParam=''%s''. Should be ''pre'' or ''post''', prePostParam)
 end
 
-params.mus = MaterialLibrary.mu_sigmaTheta(materialIdx); % TODO: db? lin?
+params.s_sigmaAlphaAz = MaterialLibrary.s_sigmaAlphaAz(materialIdx);
+params.sigma_sigmaAlphaAz = MaterialLibrary.sigma_sigmaAlphaAz(materialIdx);
+params.s_sigmaAlphaEl = MaterialLibrary.s_sigmaAlphaEl(materialIdx);
+params.sigma_sigmaAlphaEl = MaterialLibrary.sigma_sigmaAlphaEl(materialIdx);
 
 end
 
 
-function [aodAz, aodEl] = getDiffusedAngles(azCursor, elCursor, angleSpread, nRays)
-aodAz = azCursor + rndLaplace(angleSpread, nRays, 1);
-aodEl = elCursor + rndLaplace(angleSpread, nRays, 1);
-[aodAz, aodEl] = wrapAngles(aodAz, aodEl);
+function [az, el] = getDiffusedAngles(azCursor, elCursor,...
+    azimuthSpread, elevationSpread, nRays)
+az = azCursor + rndLaplace(azimuthSpread, nRays, 1);
+el = elCursor + rndLaplace(elevationSpread, nRays, 1);
+[az, el] = wrapAngles(az, el);
 
 end
 
