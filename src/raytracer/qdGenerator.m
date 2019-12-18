@@ -1,5 +1,5 @@
-function output = qdGenerator(dRayOutput, arrayOfMaterials,...
-    materialLibrary)
+function [output, cursorOutput, outputPre, outputPost] =...
+    qdGenerator(dRayOutput, arrayOfMaterials, materialLibrary)
 % output:
 % 1. reflection order
 % 2:4. DoD
@@ -19,18 +19,22 @@ function output = qdGenerator(dRayOutput, arrayOfMaterials,...
 
 if dRayOutput(1) == 0
     % no diffused components for LoS ray
-    output = dRayOutput;
+    cursorOutput = dRayOutput;
+    outputPre = [];
+    outputPost = [];
+    output = cursorOutput;
     return;
 end
 
 % Add randomness to deterministic reflection loss
-dRayOutput(9) = getRandomPg0(dRayOutput, arrayOfMaterials, materialLibrary);
+cursorOutput = dRayOutput;
+cursorOutput(9) = getRandomPg0(dRayOutput, arrayOfMaterials, materialLibrary);
 
 % Pre/post cursors output
-outputPre = getQdOutput(dRayOutput, arrayOfMaterials, materialLibrary, 'pre');
-outputPost = getQdOutput(dRayOutput, arrayOfMaterials, materialLibrary, 'post');
+outputPre = getQdOutput(cursorOutput, arrayOfMaterials, materialLibrary, 'pre');
+outputPost = getQdOutput(cursorOutput, arrayOfMaterials, materialLibrary, 'post');
 
-output = [outputPre; dRayOutput; outputPost];
+output = [outputPre; cursorOutput; outputPost];
 
 end
 
