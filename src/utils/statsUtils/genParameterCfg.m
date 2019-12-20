@@ -118,6 +118,13 @@ if ~isfield(cfgParams,'totalTimeDuration')
     cfgParams.totalTimeDuration = 1;
 end
 
+if isfield(cfgParams,'minRelativePathGainThreshold')
+    cfgParams.minRelativePathGainThreshold = string(cfgParams.minRelativePathGainThreshold);
+end
+if isfield(cfgParams,'minAbsolutePathGainThreshold')
+    cfgParams.minAbsolutePathGainThreshold = string(cfgParams.minAbsolutePathGainThreshold);
+end
+
 cfgParamsTab = sortrows(rows2vars(struct2table(cfgParams)));
 writetable(cfgParamsTab,fullfile(inputPath,'paraCfgCurrent.txt'),'FileType','text',...
     'Delimiter','tab')  
