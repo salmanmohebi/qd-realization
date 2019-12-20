@@ -144,7 +144,7 @@ AntennaOrientationTx = [1, 0, 0; 0, 1, 0; 0, 0, 1];
 AntennaOrientationRx = [1, 0, 0; 0, 1, 0; 0, 0, 1];
 multipath1 = [];
 output = [];
-MaterialLibrary = importMaterialLibrary('raytracer/Material_library.txt');
+MaterialLibrary = importMaterialLibrary(paraCfgInput.materialLibraryPath);
 
 %% Extracting CAD file and storing in an XMl file, CADFile.xml
 [CADop, switchMaterial] = getCadOutput(environmentFileName,...
