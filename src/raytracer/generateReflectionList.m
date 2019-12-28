@@ -1,5 +1,5 @@
-function triangIdxs = generateReflectionList(previousReflectionList,...
-    cadOp, visibilityMatrix)
+function triangIdxs = generateReflectionList(...
+    previousReflectionList, cadOp, visibilityMatrix)
 %GENERATEREFLECTIONLIST Given the the reflection list of the lower order,
 %generates the next order reflection list.
 

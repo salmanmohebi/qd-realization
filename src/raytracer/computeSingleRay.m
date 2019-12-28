@@ -1,6 +1,8 @@
-function [exists, dod, doa, multipath, rayLength, dopplerFactor, pathGain] =...
-    computeSingleRay(txPos, rxPos, txVel, rxVel, triangIdxList, cadData,...
-    visibilityMatrix, materialLibrary, switchQd, switchMaterial, freq)
+function [exists, dod, doa, multipath, rayLength, dopplerFactor, pathGain,...
+    currentMaxPathGain] = computeSingleRay(txPos, rxPos, txVel, rxVel,...
+    triangIdxList, cadData, visibilityMatrix, materialLibrary,...
+    switchQd, switchMaterial, freq, minAbsolutePathGainThreshold,...
+    minRelativePathGainThreshold, currentMaxPathGain)
 %COMPUTESINGLERAY Computes geometry and physics of a ray between txPos and
 %rxPos, bouncing over a give list of triangles
 
@@ -21,7 +23,8 @@ function [exists, dod, doa, multipath, rayLength, dopplerFactor, pathGain] =...
 % limitations under the License.
 
 [intersections, pathGain, rayLength] = methodOfImages(txPos, rxPos,...
-    cadData, materialLibrary, triangIdxList, switchQd, freq, 1);
+    cadData, materialLibrary, triangIdxList, switchQd, freq, 1,...
+    minAbsolutePathGainThreshold, minRelativePathGainThreshold, currentMaxPathGain);
 
 if isempty(intersections)
     % the ray does not exist
@@ -29,22 +32,33 @@ if isempty(intersections)
     dod = NaN;
     doa = NaN;
     multipath = NaN;
-    rayLength = NaN;
     dopplerFactor = NaN;
-    pathGain = NaN;
     return
 end
 
-% check if ray exists
+% Check if ray exists
 exists = verifyRayExists(txPos, intersections, rxPos,...
     cadData, visibilityMatrix, triangIdxList);
 
-% Extract info
-dod = intersections(1,:) - txPos;
-doa = intersections(end,:) - rxPos;
-multipath = getMultipathVector(txPos, intersections, rxPos);
-
-dopplerFactor = getDopplerFactor(txPos, rxPos, txVel, rxVel, cadData, triangIdxList);
+if exists
+    % Extract info
+    dod = intersections(1,:) - txPos;
+    doa = intersections(end,:) - rxPos;
+    multipath = getMultipathVector(txPos, intersections, rxPos);
+    dopplerFactor = getDopplerFactor(txPos, rxPos, txVel, rxVel, cadData, triangIdxList);
+    
+    if pathGain > currentMaxPathGain
+        % Update maximum path gain
+        currentMaxPathGain = pathGain;
+    end
+    
+else
+    dod = NaN;
+    doa = NaN;
+    multipath = NaN;
+    dopplerFactor = NaN;
+    
+end
 
 end
 
@@ -89,10 +103,4 @@ points = [txPos; intersections; rxPos];
 points = flipud(points); % rx first, tx last
 points = points.'; % following MATLAB's natural matrix indexing
 multipath = points(:).';
-end
-
-
-function l = getRayLength(txPos, intersections, rxPos)
-vectors = [intersections; rxPos] - [txPos; intersections];
-l = sum(vecnorm(vectors,2,2));
 end
