@@ -129,6 +129,10 @@ para = fieldToNum(para, 'carrierFrequency', [], 60e9);
 % Default: 6 digits
 para = fieldToNum(para, 'qdFilesFloatPrecision', [], 6);
 
+% Path to material library
+assert(isfield(para, 'materialLibraryPath'),...
+    'Need path to material library')
+
 end
 
 
