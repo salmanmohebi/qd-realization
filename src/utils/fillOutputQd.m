@@ -1,6 +1,9 @@
-function [output, multipath] = computeLosOutput(rxPos, txPos, rxVel, txVel,...
-    cadData, freq)
-%COMPUTELOSOUTPUT Computes LoS ray
+function output = fillOutputQd(delay, pathGain, aodAz, aodEl,...
+    aoaAz, aoaEl, phase, dopplerFreq)
+%FILLOUTPUTQD Systematically creates a consistent output vector for a 
+%diffused ray.
+%
+%SEE ALSO: FILLOUTPUT
 
 
 % Copyright (c) 2019, University of Padova, Department of Information
@@ -18,21 +21,17 @@ function [output, multipath] = computeLosOutput(rxPos, txPos, rxVel, txVel,...
 % See the License for the specific language governing permissions and
 % limitations under the License.
 
-isObstructed = isRayObstructed(rxPos, txPos, cadData, [], []);
-if isObstructed
-   output = [];
-   multipath = [];
-   
-else
-    reflOrder = 0;
-    dod = rxPos - txPos;
-    doa = -dod;
-    rayLen = norm(dod);
-    pathGain = friisPathGain(rayLen, freq);
-    dopplerFactor = getDopplerFactor(txPos, rxPos, txVel, rxVel, [], []);
-    
-    output = fillOutputDeterm(reflOrder, dod, doa, rayLen, pathGain, dopplerFactor, freq);
-    multipath = [rxPos, txPos];
-end
+nOut = size(delay, 1);
+
+% Compute missing outputs
+reflOrder = nan(nOut, 1);
+dod = nan(nOut, 3);
+doa = nan(nOut, 3);
+txPolarization = nan(nOut, 4);
+xPolPathGain = nan(nOut, 1);
+
+output = fillOutput(reflOrder, dod, doa, delay, pathGain,...
+    [aodAz, aodEl], [aoaAz, aoaEl], txPolarization, phase,...
+    xPolPathGain, dopplerFreq);
 
 end

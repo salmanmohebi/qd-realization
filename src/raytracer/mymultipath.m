@@ -37,26 +37,21 @@ multipath(:,1) = reflOrder;
 
 for i = 1:triangListLen
     currentTriangIdxs = triangIdxList(i,:);
+    arrayOfMaterials = cadData(currentTriangIdxs, 14);
     
     [pathExists, dod, doa, rowMultipath, rayLen, dopplerFactor, pathGain]...
     = computeSingleRay(txPos, rxPos, txVel, rxVel, currentTriangIdxs,...
     cadData, visibilityMatrix, materialLibrary, switchQd, switchMaterial, freq);
     
     if pathExists
-        deterministicRayOutput = fillOutput(reflOrder, dod, doa, rayLen,...
-            pathGain - 10, dopplerFactor, freq);
+        deterministicRayOutput = fillOutputDeterm(reflOrder, dod, doa, rayLen,...
+            pathGain, dopplerFactor, freq);
         
         if switchQd
-            % TODO: update QD model
-            arrayOfMaterials = materialLibrary.Material(triangIdxList);
-            qdOutput = [];%QDGenerator(reflOrder, deterministicRayOutput, arrayOfMaterials, iterateNumberOfRowsArraysOfPlanes?,...
-                %materialLibrary, rayLen, freq, indexOutput?,...
-                %dod, doa, txVel, velocityTemp?, indexMultipath?, indexReference?);
-            output = [output; deterministicRayOutput; qdOutput];
-            
+            output = [output;...
+                qdGenerator(deterministicRayOutput, arrayOfMaterials, materialLibrary)];
         else
             output(i,:) = deterministicRayOutput;
-            
         end
         
         multipath(i,2:end) = rowMultipath;
