@@ -152,8 +152,8 @@ end
 
 function [az, el] = getDiffusedAngles(azCursor, elCursor,...
     azimuthSpread, elevationSpread, nRays)
-az = azCursor + rndLaplace(azimuthSpread, nRays, 1);
-el = elCursor + rndLaplace(elevationSpread, nRays, 1);
+az = rndLaplace(azCursor, azimuthSpread, nRays, 1);
+el = rndLaplace(elCursor, elevationSpread, nRays, 1);
 [az, el] = wrapAngles(az, el);
 
 end

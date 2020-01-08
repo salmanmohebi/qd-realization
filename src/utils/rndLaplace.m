@@ -1,4 +1,4 @@
-function x = rndLaplace(sigma, m, n)
+function x = rndLaplace(mu, sigma, m, n)
 %RNDLAPLACE Generate a matrix of size [m, n] with independent laplacian
 %random variables. The generated variables have mean(x) = 0,
 %std(x) = sigma.
@@ -21,5 +21,5 @@ function x = rndLaplace(sigma, m, n)
 
 u = rand(m,n) - 0.5;
 b = sigma / sqrt(2);
-x = -b * sign(u) .* log(1 - 2*abs(u));
+x = mu - b * sign(u) .* log(1 - 2*abs(u)) ;
 end
