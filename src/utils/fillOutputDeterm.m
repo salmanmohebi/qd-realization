@@ -6,7 +6,7 @@ function output = fillOutputDeterm(reflOrder, dod, doa, rayLen, pathGain,...
 %SEE ALSO: FILLOUTPUT
 
 
-% Copyright (c) 2019, University of Padova, Department of Information
+% Copyright (c) 2020, University of Padova, Department of Information
 % Engineering, SIGNET lab.
 %
 % Licensed under the Apache License, Version 2.0 (the "License");
