@@ -141,6 +141,10 @@ para = fieldToNum(para, 'minAbsolutePathGainThreshold', [], -Inf);
 % Default: -Inf
 para = fieldToNum(para, 'minRelativePathGainThreshold', [], -Inf);
 
+% Path to material library
+assert(isfield(para, 'materialLibraryPath'),...
+    'Need path to material library')
+
 end
 
 

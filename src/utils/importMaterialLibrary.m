@@ -24,6 +24,23 @@ function tab = importMaterialLibrary(path)
 % See the License for the specific language governing permissions and
 % limitations under the License.
 
+[~, ~, ext] = fileparts(path);
+
+switch(ext)
+    case '.txt'
+        tab = importTxtMaterialLibrary(path);
+    case '.csv'
+        tab = importCsvMaterialLibrary(path);
+    otherwise
+        error('Exension ''%s'' not supported for material libraries', ext)
+end
+
+end
+
+%% Importing different material library extensions
+% TXT
+function tab = importTxtMaterialLibrary(path)
+
 fid = fopen(path);
 
 fgetl(fid); % ignore first line: hard code column names
@@ -60,4 +77,11 @@ while ~feof(fid)
 end
 
 fclose(fid);
+
+end
+
+% CSV
+function tab = importCsvMaterialLibrary(path)
+tab = readtable(path);
+
 end

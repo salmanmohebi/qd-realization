@@ -184,9 +184,13 @@ if numberOfRowsArraysOfPlanes>0
             
             % refer to "multipath - WCL17_revised.pdf" in this folder for QD model
             if  switchMaterial == 1 && QDGeneratorSwitch == 1
-                [output,indexOutput,switchQD] = QDGenerator(orderOfReflection,...
-                    output,arrayOfMaterials,iterateNumberOfRowsArraysOfPlanes,MaterialLibrary,distance,...
-                    frequency,indexOutput,dod,doa,velocityTx,velocityTemp,indexMultipath,indexReference);
+                % Trying new qdGenerator
+                [~, ~, outputPre, outputPost] = qdGenerator(...
+                    output(indexOutput-1,:), arrayOfMaterials, MaterialLibrary);
+                output = [output; outputPre; outputPost];
+                indexOutput = indexOutput + size(outputPre, 1) +...
+                    size(outputPost, 1); % for retrocompatibility
+                switchQD = 1; % for retrocompatibility
             end
         end
         

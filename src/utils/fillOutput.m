@@ -1,5 +1,5 @@
-function output = fillOutput(reflOrder, dod, doa, rayLen, pathGain,...
-    dopplerFactor, freq)
+function output = fillOutput(reflOrder, dod, doa, delay, pathGain,...
+    aod, aoa, txPolarization, reflPhaseShift, xPolPathGain, dopplerFreq)
 %FILLOUTPUT Systematically creates a consistent output vector for a given
 %ray. Columns are as follows:
 % 1. Reflection order
@@ -11,9 +11,9 @@ function output = fillOutput(reflOrder, dod, doa, rayLen, pathGain,...
 % 9. Path Gain [dB]
 % 10-11. AoD azimuth/elevation [deg]
 % 12-13. AoA azimuth/elevation [deg]
-% 14-17. (TBD)
-% 18. Phase shift (caused by reflections, i.e. reflOrder*pi)
-% 19. (TBD)
+% 14-17. TX polarization matrix [(1,1), (1,2), (2,1), (2,2)]
+% 18. Phase shift (caused by reflections, i.e. reflOrder*pi) [rad]
+% 19. Cross-Polarization path gain [?]
 % 20. Doppler frequency
 % 21. 0 (for backward compatibility)
 
@@ -33,36 +33,32 @@ function output = fillOutput(reflOrder, dod, doa, rayLen, pathGain,...
 % See the License for the specific language governing permissions and
 % limitations under the License.
 
-output = nan(1,21);
+nOut = size(reflOrder, 1);
+output = nan(nOut, 21);
 
 % Reflection Order
-output(1) = reflOrder;
+output(:, 1) = reflOrder;
 % Direction of Departure
-output(2:4) = dod;
+output(:, 2:4) = dod;
 % Direction of Arrival
-output(5:7) = doa;
+output(:, 5:7) = doa;
 % Time delay
-output(8) = rayLen / 3e8;
+output(:, 8) = delay;
 % Path gain
-output(9) = pathGain;
-% AoD azimuth
-output(10) = mod(atan2d(dod(2),dod(1)), 360);
-% AoD elevation
-output(11) = acosd(dod(3) / norm(dod));
-% AoA azimuth
-output(12) = mod(atan2d(doa(2),doa(1)), 360);
-% AoA elevation
-output(13) = acosd(doa(3) / norm(doa));
-% output(14)
-% output(15)
-% output(16)
-% output(17)
+output(:, 9) = pathGain;
+% AoD [azimuth, elevation]
+output(:, 10:11) = aod;
+% AoA [azimuth, elevation]
+output(:, 12:13) = aoa;
+% Tx polarization
+output(:, 14:17) = txPolarization;
 % Phase shift caused by reflections
-output(18) = reflOrder * pi;
-% output(19)
+output(:, 18) = reflPhaseShift;
+% Cross-polarization Path Gain
+output(:, 19) = xPolPathGain;
 % Doppler frequency
-output(20) = dopplerFactor * freq;
-
-output(21) = 0;
+output(:, 20) = dopplerFreq;
+% (Unknown - for retrocompatibility)
+output(:, 21) = 0;
 
 end

@@ -109,19 +109,13 @@ else
     % Intermediate reflections
     % Consider path from current to next intersection and reflection
     % loss of current bounce's material
-    nextIntersection = intersections(recursionDepth+1, :);
+    nextIntersection = intersections(recursionDepth + 1, :);
     rayLen = norm(currentIntersection - nextIntersection);
 end
 
 materialId = cadData(triangIdxs(recursionDepth), 14);
-if switchQd
-    % random reflection losses
-    warning('QD not supported yet. Please make sure to generate random RL onyl once')
-else
-    % deterministic reflection losses
-    % TODO: update with Rician distribution
-    totReflectionLoss = totReflectionLoss + materialLibrary.mu_RL(materialId);
-end
+% deterministic reflection losses
+totReflectionLoss = totReflectionLoss + materialLibrary.mu_RL(materialId);
 
 totRayLen = totRayLen + rayLen;
 

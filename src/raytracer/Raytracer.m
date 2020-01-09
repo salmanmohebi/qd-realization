@@ -124,7 +124,7 @@ Rx = nodeLoc(2,:);
 vtx = nodeVelocities(1,:);
 vrx = nodeVelocities(2,:);
 
-MaterialLibrary = importMaterialLibrary('raytracer/Material_library.txt');
+MaterialLibrary = importMaterialLibrary(paraCfgInput.materialLibraryPath);
 
 % Extracting CAD file and storing in an XMl file, CADFile.xml
 [CADop, switchMaterial, visibilityMatrix] = getCadOutput(...
