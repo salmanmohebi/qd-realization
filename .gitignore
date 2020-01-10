@@ -19,3 +19,13 @@
 # MATLAB
 *.asv
 *.m~
+
+# Do NOT ignore main experiment files
+!src/custom_scenarios/
+src/custom_scenarios/*
+!src/custom_scenarios/NistCallJanuaryScenario/
+src/custom_scenarios/NistCallJanuaryScenario/*
+!src/custom_scenarios/NistCallJanuaryScenario/Input/
+!src/custom_scenarios/NistCallJanuaryScenario/plotRunTimeTable.m
+!src/custom_scenarios/NistCallJanuaryScenario/runAllConfigParams.m
+!src/custom_scenarios/NistCallJanuaryScenario/runTimeTable*.mat
