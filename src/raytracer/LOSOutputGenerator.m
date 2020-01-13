@@ -114,7 +114,7 @@ if switch3==1 % if DoA exists
     output1(21) = 0;
     % Cross polarization path gain
     if switchCP==1
-        output1(19) = 20*log10(lambda/(4*pi*delay));
+        output1(19) = 20*log10(lambda/(4*pi*d));
     else
         output1(19) = 0;
     end

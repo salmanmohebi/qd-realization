@@ -1,12 +1,6 @@
-function closeQdFilesIds(fids, useOptimizedOutputToFile)
-%CLOSEQDFILESIDS Closes and flushes opened QdFiles given in the fids matrix
-%
-% INPUTS:
-% - fids: matrix of file IDs previously opened. The main diagonal is
-% NaN-filled
-% - useOptimizedOutputToFile: see PARAMETERCFG
-%
-% SEE ALSO: GETQDFILESIDS, WRITEQDFILEOUTPUT, PARAMETERCFG
+function [output, multipath] = computeLosOutput(rxPos, txPos, rxVel, txVel,...
+    cadData, freq)
+%COMPUTELOSOUTPUT Computes LoS ray
 
 
 % Copyright (c) 2019, University of Padova, Department of Information
@@ -24,16 +18,21 @@ function closeQdFilesIds(fids, useOptimizedOutputToFile)
 % See the License for the specific language governing permissions and
 % limitations under the License.
 
-if ~useOptimizedOutputToFile
-    % do nothing, files are already closed
-    return
-end
-
-for i = 1:numel(fids)
-    if ~isnan(fids(i))
-        fclose(fids(i));
-    end
+isObstructed = isRayObstructed(rxPos, txPos, cadData, [], []);
+if isObstructed
+   output = [];
+   multipath = [];
+   
+else
+    reflOrder = 0;
+    dod = rxPos - txPos;
+    doa = -dod;
+    rayLen = norm(dod);
+    pathGain = friisPathGain(rayLen, freq);
+    dopplerFactor = getDopplerFactor(txPos, rxPos, txVel, rxVel, [], []);
     
+    output = fillOutputDeterm(reflOrder, dod, doa, rayLen, pathGain, dopplerFactor, freq);
+    multipath = [rxPos, txPos];
 end
 
 end

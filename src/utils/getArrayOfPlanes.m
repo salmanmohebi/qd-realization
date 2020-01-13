@@ -1,9 +1,9 @@
-function x = rndExp(lambda,m,n)
-%RNDEXP Generate a matrix of size [m, n] with independent exponential random
-%variables. The generated mean(x) = 1/lambda.
+function arrayOfPlanes = getArrayOfPlanes(triangIdxs,cadData)
+%GETARRAYOFPLANES Extract legacy ArrayOfPlanes from CAD file and triangles
+%list. Needed for backward comaptibility.
 
 
-% Copyright (c) 2020, University of Padova, Department of Information
+% Copyright (c) 2019, University of Padova, Department of Information
 % Engineering, SIGNET lab.
 %
 % Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,5 +18,9 @@ function x = rndExp(lambda,m,n)
 % See the License for the specific language governing permissions and
 % limitations under the License.
 
-x = -log(1-rand(m,n)) / lambda;
+reflOrder = size(triangIdxs,2);
+triangles = cadData(triangIdxs,:);
+planes = triangles(:, 10:13);
+arrayOfPlanes = reshape(planes.', [], 1).';
+arrayOfPlanes = [reflOrder, arrayOfPlanes];
 end

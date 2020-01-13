@@ -1,21 +1,23 @@
 function [output, cursorOutput, outputPre, outputPost] =...
     qdGenerator(dRayOutput, arrayOfMaterials, materialLibrary)
-% output:
-% 1. reflection order
-% 2:4. DoD
-% 5:7. DoA
-% 8. delay
-% 9. Path Gain
-% 10. AoD Azimuth
-% 11. AoD Elevation
-% 12. AoA Azimuth
-% 13. AoA Elevation
-%     14:15. PolarizationTx(1,:)
-%     16:17. PolarizationTx(2,:)
-% 18. phase (reflOrder*pi)
-%     19. Cross-pol path gain
-% 20. phase (dopplerFactor*freq)
-% 21. 0 (?)
+%QDGENERATOR Generate diffused components starting from deterministic rays
+%following NIST's Quasi-Deterministic model.
+
+
+% Copyright (c) 2020, University of Padova, Department of Information
+% Engineering, SIGNET lab.
+%
+% Licensed under the Apache License, Version 2.0 (the "License");
+% you may not use this file except in compliance with the License.
+% You may obtain a copy of the License at
+%
+%    http://www.apache.org/licenses/LICENSE-2.0
+%
+% Unless required by applicable law or agreed to in writing, software
+% distributed under the License is distributed on an "AS IS" BASIS,
+% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+% See the License for the specific language governing permissions and
+% limitations under the License.
 
 if dRayOutput(1) == 0
     % no diffused components for LoS ray
@@ -40,27 +42,25 @@ end
 
 
 %% Utils
-function pg = getRandomPg0(dRayOutput, arrayOfMaterials, MaterialLibrary)
-warning('TODO: Add randomness to reflection loss of deterministic ray')
-
+function pg = getRandomPg0(dRayOutput, arrayOfMaterials, materialLibrary)
 % Baseline: deterministic path gain
 pg = dRayOutput(9);
 for i = 1:length(arrayOfMaterials)
     matIdx = arrayOfMaterials(i);
     
-    s_material = MaterialLibrary.s_RL(matIdx);
-    sigma_material = MaterialLibrary.sigma_RL(matIdx);
+    s_material = materialLibrary.s_RL(matIdx);
+    sigma_material = materialLibrary.sigma_RL(matIdx);
     rl = rndRician(s_material, sigma_material, 1, 1);
     
-    muRl = MaterialLibrary.mu_RL(matIdx);
+    muRl = materialLibrary.mu_RL(matIdx);
     pg = pg - (rl - muRl);
 end
 
 end
 
 
-function output = getQdOutput(dRayOutput, arrayOfMaterials, MaterialLibrary, prePostParam)
-params = getParams(arrayOfMaterials, MaterialLibrary, prePostParam);
+function output = getQdOutput(dRayOutput, arrayOfMaterials, materialLibrary, prePostParam)
+params = getParams(arrayOfMaterials, materialLibrary, prePostParam);
 
 % delays
 tau0 = dRayOutput(8); % main cursor's delay [s]
@@ -102,54 +102,39 @@ aoaElevationSpread = rndRician(params.s_sigmaAlphaEl, params.sigma_sigmaAlphaEl,
     aoaAzimuthSpread, aoaElevationSpread, params.nRays);
 
 % Combine results into output matrix
-% Copy D-ray outputs as some columns are repeated (e.g., reflection order)
-output = repmat(dRayOutput, params.nRays, 1);
-% delay
-output(:,8) = taus;
-% path gain
-output(:,9) = pg;
-% AoD azimuth
-output(:,10) = aodAz;
-% AoD elevation
-output(:,11) = aodEl;
-% AoA azimuth
-output(:,12) = aoaAz;
-% AoA elevation
-output(:,13) = aoaEl;
-% phase
-output(:,18) = rand(params.nRays, 1) * 2*pi;
-% doppler phase shift: uniformly random included in "phase" entry
-output(:,20) = 0;
+phase = rand(params.nRays, 1) * 2*pi;
+dopplerShift = zeros(params.nRays, 1);
+output = fillOutputQd(taus, pg, aodAz, aodEl, aoaAz, aoaEl, phase, dopplerShift);
 
 end
 
 
-function params = getParams(arrayOfMaterials, MaterialLibrary, prePostParam)
+function params = getParams(arrayOfMaterials, materialLibrary, prePostParam)
 
 materialIdx = arrayOfMaterials(end); % QD based on last reflector
 
 switch(prePostParam)
     case 'pre'
-        params.s_K = MaterialLibrary.s_K_Precursor(materialIdx);
-        params.sigma_K = MaterialLibrary.sigma_K_Precursor(materialIdx);
-        params.s_gamma = MaterialLibrary.s_gamma_Precursor(materialIdx);
-        params.sigma_gamma = MaterialLibrary.sigma_gamma_Precursor(materialIdx);
-        params.s_sigmaS = MaterialLibrary.s_sigmaS_Precursor(materialIdx);
-        params.sigma_sigmaS = MaterialLibrary.sigma_sigmaS_Precursor(materialIdx);
-        params.s_lambda = MaterialLibrary.s_lambda_Precursor(materialIdx);
-        params.sigma_lambda = MaterialLibrary.sigma_lambda_Precursor(materialIdx);
+        params.s_K = materialLibrary.s_K_Precursor(materialIdx);
+        params.sigma_K = materialLibrary.sigma_K_Precursor(materialIdx);
+        params.s_gamma = materialLibrary.s_gamma_Precursor(materialIdx);
+        params.sigma_gamma = materialLibrary.sigma_gamma_Precursor(materialIdx);
+        params.s_sigmaS = materialLibrary.s_sigmaS_Precursor(materialIdx);
+        params.sigma_sigmaS = materialLibrary.sigma_sigmaS_Precursor(materialIdx);
+        params.s_lambda = materialLibrary.s_lambda_Precursor(materialIdx);
+        params.sigma_lambda = materialLibrary.sigma_lambda_Precursor(materialIdx);
         params.delayMultiplier = -1;
         params.nRays = 3;
         
     case 'post'
-        params.s_K = MaterialLibrary.s_K_Postcursor(materialIdx);
-        params.sigma_K = MaterialLibrary.sigma_K_Postcursor(materialIdx);
-        params.s_gamma = MaterialLibrary.s_gamma_Postcursor(materialIdx);
-        params.sigma_gamma = MaterialLibrary.sigma_gamma_Postcursor(materialIdx);
-        params.s_sigmaS = MaterialLibrary.s_sigmaS_Postcursor(materialIdx);
-        params.sigma_sigmaS = MaterialLibrary.sigma_sigmaS_Postcursor(materialIdx);
-        params.s_lambda = MaterialLibrary.s_lambda_Postcursor(materialIdx);
-        params.sigma_lambda = MaterialLibrary.sigma_lambda_Postcursor(materialIdx);
+        params.s_K = materialLibrary.s_K_Postcursor(materialIdx);
+        params.sigma_K = materialLibrary.sigma_K_Postcursor(materialIdx);
+        params.s_gamma = materialLibrary.s_gamma_Postcursor(materialIdx);
+        params.sigma_gamma = materialLibrary.sigma_gamma_Postcursor(materialIdx);
+        params.s_sigmaS = materialLibrary.s_sigmaS_Postcursor(materialIdx);
+        params.sigma_sigmaS = materialLibrary.sigma_sigmaS_Postcursor(materialIdx);
+        params.s_lambda = materialLibrary.s_lambda_Postcursor(materialIdx);
+        params.sigma_lambda = materialLibrary.sigma_lambda_Postcursor(materialIdx);
         params.delayMultiplier = 1;
         params.nRays = 16;
         
@@ -157,18 +142,18 @@ switch(prePostParam)
         error('prePostParam=''%s''. Should be ''pre'' or ''post''', prePostParam)
 end
 
-params.s_sigmaAlphaAz = MaterialLibrary.s_sigmaAlphaAz(materialIdx);
-params.sigma_sigmaAlphaAz = MaterialLibrary.sigma_sigmaAlphaAz(materialIdx);
-params.s_sigmaAlphaEl = MaterialLibrary.s_sigmaAlphaEl(materialIdx);
-params.sigma_sigmaAlphaEl = MaterialLibrary.sigma_sigmaAlphaEl(materialIdx);
+params.s_sigmaAlphaAz = materialLibrary.s_sigmaAlphaAz(materialIdx);
+params.sigma_sigmaAlphaAz = materialLibrary.sigma_sigmaAlphaAz(materialIdx);
+params.s_sigmaAlphaEl = materialLibrary.s_sigmaAlphaEl(materialIdx);
+params.sigma_sigmaAlphaEl = materialLibrary.sigma_sigmaAlphaEl(materialIdx);
 
 end
 
 
 function [az, el] = getDiffusedAngles(azCursor, elCursor,...
     azimuthSpread, elevationSpread, nRays)
-az = azCursor + rndLaplace(azimuthSpread, nRays, 1);
-el = elCursor + rndLaplace(elevationSpread, nRays, 1);
+az = rndLaplace(azCursor, azimuthSpread, nRays, 1);
+el = rndLaplace(elCursor, elevationSpread, nRays, 1);
 [az, el] = wrapAngles(az, el);
 
 end

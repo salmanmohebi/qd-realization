@@ -120,7 +120,7 @@ for iterateVolume=1:size(volume)
             switch2=0;
             for iterateMaterials=1:size(MaterialLibrary,1)
                 if strcmpi(MaterialLibrary.Reflector{iterateMaterials},Material)
-                    CADOutput(indexCADOutput,14) = MaterialLibrary.PrimaryKey(iterateMaterials);
+                    CADOutput(indexCADOutput,14) = iterateMaterials;
                     switch2=1;
                 end
             end

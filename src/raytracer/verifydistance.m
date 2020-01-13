@@ -38,7 +38,6 @@ function switch1 = verifydistance(r, Tx, CADop, i)
 %
 % Modified by: Mattia Lecci <leccimat@dei.unipd.it>, Used MATLAB functions instead of custom ones
 
-
 plane1 = CADop(i,10:13);
 switch1 = 0;
 
@@ -64,9 +63,8 @@ if switch1 ~= 1
     
     % checks whether projection of center (Tx) on to plane of triangle lies within
     % triangle and sphere
-    switch_triangle = PointInTriangle(Point,Point1,Point2,Point3);
-    
-    if d1 <= r && switch_triangle == 1
+    switch_triangle = pointInTriangle(Point,Point1,Point2,Point3);
+    if d1 <= r && switch_triangle
         switch1 = 1;
         
     elseif d1 <= r && switch_triangle == 0

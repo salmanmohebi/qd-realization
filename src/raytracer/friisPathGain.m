@@ -1,9 +1,9 @@
-function x = rndExp(lambda,m,n)
-%RNDEXP Generate a matrix of size [m, n] with independent exponential random
-%variables. The generated mean(x) = 1/lambda.
+function pg = friisPathGain(d,f)
+%FRIISPATHGAIN Compute Friis' free space path gain for the distance d at
+%frequency f
 
 
-% Copyright (c) 2020, University of Padova, Department of Information
+% Copyright (c) 2019, University of Padova, Department of Information
 % Engineering, SIGNET lab.
 %
 % Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,5 +18,6 @@ function x = rndExp(lambda,m,n)
 % See the License for the specific language governing permissions and
 % limitations under the License.
 
-x = -log(1-rand(m,n)) / lambda;
+% c/(4*pi) = 23873241.463784
+pg = 20 * log10(23873241.463784 / (f*d));
 end

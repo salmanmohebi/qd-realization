@@ -1,12 +1,7 @@
-function closeQdFilesIds(fids, useOptimizedOutputToFile)
-%CLOSEQDFILESIDS Closes and flushes opened QdFiles given in the fids matrix
-%
-% INPUTS:
-% - fids: matrix of file IDs previously opened. The main diagonal is
-% NaN-filled
-% - useOptimizedOutputToFile: see PARAMETERCFG
-%
-% SEE ALSO: GETQDFILESIDS, WRITEQDFILEOUTPUT, PARAMETERCFG
+function dopplerFactor = getDopplerFactor(txPos, rxPos, txVel, rxVel,...
+    cadData, triangIdxList)
+%GETDOPPLERFACTOR Get doppler factor from given positions, velocities and
+%triangle bounces.
 
 
 % Copyright (c) 2019, University of Padova, Department of Information
@@ -24,16 +19,18 @@ function closeQdFilesIds(fids, useOptimizedOutputToFile)
 % See the License for the specific language governing permissions and
 % limitations under the License.
 
-if ~useOptimizedOutputToFile
-    % do nothing, files are already closed
-    return
+txVelRefl = txVel;
+txPosRefl = txPos;
+for i = 1:length(triangIdxList)
+    plane = cadData(triangIdxList(i), 10:13);
+    txVelRefl = reflectedVelocity(txVelRefl, plane);
+    txPosRefl = reflectedImagePointPlane(txPosRefl, plane);
 end
 
-for i = 1:numel(fids)
-    if ~isnan(fids(i))
-        fclose(fids(i));
-    end
-    
-end
+relativeVel = txVelRefl - rxVel;
+relativePos = txPosRefl - rxPos;
+radialRelativeVel = dot(relativeVel, relativePos) / norm(relativePos);
+
+dopplerFactor = -radialRelativeVel / 3e8;
 
 end
