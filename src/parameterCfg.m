@@ -129,6 +129,11 @@ para = fieldToNum(para, 'carrierFrequency', [], 60e9);
 % Default: 6 digits
 para = fieldToNum(para, 'qdFilesFloatPrecision', [], 6);
 
+% Use optimized output to file. Might create problems when files are too
+% many, especially on servers. In this case, try to disable it (=0)
+% Default: 1 (true)
+para = fieldToNum(para, 'useOptimizedOutputToFile', [], 1);
+
 % Threshold for minimum absolute Path Gain.
 % Possible use cases: noise floor, receiver's sensitivity.
 % Considerations on link budget must be made externally to the QD simulator
@@ -140,6 +145,10 @@ para = fieldToNum(para, 'minAbsolutePathGainThreshold', [], -Inf);
 % significant
 % Default: -Inf
 para = fieldToNum(para, 'minRelativePathGainThreshold', [], -Inf);
+
+% Path to material library
+assert(isfield(para, 'materialLibraryPath'),...
+    'Need path to material library')
 
 end
 

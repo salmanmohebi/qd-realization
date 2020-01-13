@@ -1,18 +1,10 @@
-function out = readNodesPosition(path)
-%READNODESPOSITION Function that extracts the Nodes Position from the
-% output file, as described by the documentation).
-%
-% INPUTS:
-% - path: file path. This could be either and absolute path, or a relative
-% path, starting at least from the Output/ folder.
-%
-% OUTPUTS:
-% - out: matrix version of the csv file
-%
-% SEE ALSO: ISNODESPOSITION
+function r = rndRician(s, sigma, m ,n)
+%RNDRICIAN Generate a matrix of size [m, n] with independent rician
+%random variables. Parameters s and sigma follow MATLAB's Statistics and
+%Machine Learning Toolbox RicianDistribution's description.
 
 
-% Copyright (c) 2019, University of Padova, Department of Information
+% Copyright (c) 2020, University of Padova, Department of Information
 % Engineering, SIGNET lab.
 %
 % Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +19,7 @@ function out = readNodesPosition(path)
 % See the License for the specific language governing permissions and
 % limitations under the License.
 
-out = csvread(path); % not using readmatrix for retrocompatibility
-
+x = randn(m, n)*sigma + s;
+y = randn(m, n)*sigma;
+r = sqrt(x.^2 + y.^2);
 end

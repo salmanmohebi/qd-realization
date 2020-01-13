@@ -3,9 +3,8 @@ function outputPath = launchRaytracer(varargin)
 %functionalized main script
 %
 %LAUNCHRAYTRACER(): runs default scenario ('ScenarioTest')
-%LAUNCHRAYTRACER(scenarioName): runs the given scenario. scenarioName can
-%contain a path relative to this function's parent folder, e.g.,
-%examples/Indoor1. Default: ''.
+%LAUNCHRAYTRACER(scenarioPath): runs the scenario from the given path.
+%Default: '', traslated into 'ScenarioTest'.
 %LAUNCHRAYTRACER(scenarioName, forcedParaCfg): additionally, forcedParaCfg
 %overwrites the configuration parameters obtained by the configuration
 %input file. Default: struct().
@@ -17,7 +16,7 @@ addpath('raytracer', 'utils', 'utils/min-distance-3d-triangles')
 % Input handling
 p = inputParser;
 
-addOptional(p, 'scenarioName', '', @(x) isStringScalar(x) || ischar(x));
+addOptional(p, 'scenarioPath', '', @(x) isStringScalar(x) || ischar(x));
 addOptional(p, 'forcedParaCfg', struct(), @isstruct);
 addParameter(p, 'verbose', 1, @(x) validateattributes(x, ...
     {'numeric'}, {'scalar', 'nonempty', 'integer', 'nonnegative'},...
@@ -25,7 +24,7 @@ addParameter(p, 'verbose', 1, @(x) validateattributes(x, ...
 
 parse(p, varargin{:});
 
-scenarioName = p.Results.scenarioName;
+scenarioPath = p.Results.scenarioPath;
 forcedParaCfg = p.Results.forcedParaCfg;
 verbose = p.Results.verbose;
 
@@ -35,41 +34,40 @@ addpath(fullfile(functionPath, 'raytracer'),...
     fullfile(functionPath, 'utils'))
 
 % Input
-if ~isempty(scenarioName)
+if ~isempty(scenarioPath)
     if verbose > 0
-        fprintf('Use customized scenario: %s.\n',scenarioName);
+        fprintf('Use customized scenario: %s.\n', scenarioPath);
     end
 else
-    scenarioName = 'ScenarioTest';
+    scenarioPath = fullfile(functionPath, 'ScenarioTest');
     
     if verbose > 0
         fprintf('Use default scenario: ScenarioTest.\n');
     end
 end
-scenarioPathStr = fullfile(functionPath,scenarioName);
 
 % Check input scenario file
-if ~isfolder(scenarioPathStr)
-    scenarioInputPath = fullfile(functionPath, scenarioName, 'Input');
+if ~isfolder(scenarioPath)
+    scenarioInputPath = fullfile(functionPath, scenarioPath, 'Input');
     mkdir(scenarioInputPath);
     
     copyfile(fullfile(functionPath, 'Input'), scenarioInputPath);
     
     if verbose > 0
         fprintf(['%s folder does not exist, creating a new folder with',...
-            ' default scenario from root Input folder.\n'],scenarioName);
+            ' default scenario from root Input folder.\n'],scenarioPath);
     end
     
 else
     if verbose > 0
         fprintf('%s folder already exists and using this scenario to process.\n',...
-            scenarioName);
+            scenarioPath);
     end
     
 end
 
 % Input system and node-related parameters
-paraCfg = parameterCfg(scenarioName);
+paraCfg = parameterCfg(scenarioPath);
 [paraCfg, nodeCfg] = nodeProfileCfg(paraCfg);
 
 % Apply forced configuration parameters

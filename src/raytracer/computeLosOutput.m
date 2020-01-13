@@ -33,7 +33,7 @@ else
     doa = -dod;
     dopplerFactor = getDopplerFactor(txPos, rxPos, txVel, rxVel, [], []);
     
-    output = fillOutput(reflOrder, dod, doa, rayLen, pathGain, dopplerFactor, freq);
+    output = fillOutputDeterm(reflOrder, dod, doa, rayLen, pathGain, dopplerFactor, freq);
     multipath = [rxPos, txPos];
 end
 
