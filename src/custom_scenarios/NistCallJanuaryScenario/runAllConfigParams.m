@@ -7,7 +7,7 @@ addpath('../..') % add src folder to path
 %% Parameters
 reflList = [1, 2, 3];
 switchQdList = [0, 1];
-relThList = [-40, -25];
+relThList = [-Inf, -40, -25];
 floorList = ["Metal", "Ceiling"];
 
 %% Loop over all combinations of parameters

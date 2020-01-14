@@ -3,7 +3,7 @@ close all
 clc
 
 %%
-load('runTimeTable2')
+load('runTimeTable3')
 
 for i = 1:size(runTimeTable, 2)-1
     figure
