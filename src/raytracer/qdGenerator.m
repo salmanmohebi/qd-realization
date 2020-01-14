@@ -89,7 +89,12 @@ sigma_s = rndRician(params.s_sigmaS, params.sigma_sigmaS, 1, 1); % [std.err in e
 
 s = sigma_s * randn(params.nRays, 1);
 pg = pg0db - Kdb + 10*log10(exp(1)) * (-abs(taus - tau0)/gamma + s);
-% TODO: remove MPCs with more power than main cursor
+
+% Remove MPCs with more power than main cursor
+removeMpcMask = pg >= pg0db;
+taus(removeMpcMask) = [];
+pg(removeMpcMask) = [];
+params.nRays = length(taus);
 
 % angle spread
 aodAzimuthSpread = rndRician(params.s_sigmaAlphaAz, params.sigma_sigmaAlphaAz, 1, 1);
