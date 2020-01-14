@@ -13,7 +13,8 @@ floorList = ["Metal", "Ceiling"];
 %% Loop over all combinations of parameters
 tableVarNames = {'totalNumberOfReflections', 'switchQDGenerator',...
     'minRelativePathGainThreshold', 'floorMaterial', 'runTime'};
-runTimeTable = array2table(nan(0, length(tableVarNames)),...
+runTimeTable = table('Size',[0, length(tableVarNames)],...
+    'VariableTypes', ["double", "double", "double", "string", "double"],...
     'VariableNames', tableVarNames);
 % i = 1;
 
@@ -47,9 +48,9 @@ for refl = reflList
                 runTime = toc(t0);
                 
                 % save run time
-                tableRow = array2table([relf, switchQd, relTh, floorMaterial, runTime],...
+                tableRow = table(refl, switchQd, relTh, floorMaterial, runTime,...
                     'VariableNames', tableVarNames);
-                runTimeTable(end + 1) = tableRow;
+                runTimeTable(end + 1, :) = tableRow;
 %                 runTimeTable{i, 'totalNumberOfReflections'} = refl;
 %                 runTimeTable{i, 'switchQDGenerator'} = switchQd;
 %                 runTimeTable{i, 'minRelativePathGainThreshold'} = relTh;
