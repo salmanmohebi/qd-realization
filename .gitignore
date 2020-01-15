@@ -26,8 +26,7 @@ src/custom_scenarios/*
 !src/custom_scenarios/NistCallJanuaryIndoor1/
 src/custom_scenarios/NistCallJanuaryIndoor1/*
 !src/custom_scenarios/NistCallJanuaryIndoor1/Input/
-!src/custom_scenarios/NistCallJanuaryIndoor1/plotRunTimeTable.m
-!src/custom_scenarios/NistCallJanuaryIndoor1/runAllConfigParams.m
+!src/custom_scenarios/NistCallJanuaryIndoor1/*.m
 !src/custom_scenarios/NistCallJanuaryIndoor1/runTimeTable*.mat
 
 !src/custom_scenarios/
@@ -35,6 +34,5 @@ src/custom_scenarios/*
 !src/custom_scenarios/NistCallJanuaryInterference/
 src/custom_scenarios/NistCallJanuaryInterference/*
 !src/custom_scenarios/NistCallJanuaryInterference/Input/
-!src/custom_scenarios/NistCallJanuaryInterference/plotRunTimeTable.m
-!src/custom_scenarios/NistCallJanuaryInterference/runAllConfigParams.m
+!src/custom_scenarios/NistCallJanuaryInterference/*.m
 !src/custom_scenarios/NistCallJanuaryInterference/runTimeTable*.mat
