@@ -7,8 +7,8 @@ addpath('../..') % add src folder to path
 %% Parameters
 reflList = [1, 2, 3];
 switchQdList = [0, 1];
-relThList = [-Inf, -40, -25];
-floorList = ["Metal", "Ceiling"];
+relThList = [-Inf, -40, -25, -15];
+floorList = ["Metal"];
 
 %% Loop over all combinations of parameters
 tableVarNames = {'totalNumberOfReflections', 'switchQDGenerator',...
