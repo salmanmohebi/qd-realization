@@ -8,7 +8,7 @@ scenarios = "refl2_qd0_relTh-Inf_floorMetal";% getScenarios(dimension_labels{1}.
 
 for i = 1:length(scenarios)
     % reduce unused dimensions
-    sinr{i} = shiftdim(results(1,1,1,1,1,1,1,:,:));
+    sinr{i} = vertcat(results{1,i,1,1,1,1,1,:});
 end
 
 %% ns-3
@@ -17,7 +17,7 @@ folders(~[folders.isdir]) = [];
 folders({folders.name} == "Input") = [];
 folders({folders.name} == ".") = [];
 folders({folders.name} == "..") = [];
-scenariosToPlot = "refl2_qd0_relTh-Inf_floorMetal";%string({folders.name});
+scenariosToPlot = string({folders.name});
 
 
 for i = 1:length(scenariosToPlot)

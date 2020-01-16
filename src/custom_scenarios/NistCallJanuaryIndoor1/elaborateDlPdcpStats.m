@@ -9,7 +9,7 @@ targetCellId = 1;
 targetRnti = 1;
 
 %% Process dlPdcpStats
-scenarios = "refl2_qd0_relTh-Inf_floorMetal";% getScenarios(dimension_labels{1}.scenario);
+scenarios = getScenarios(dimension_labels{1}.scenario);
 rows = ["Time", "CellId", "RNTI", "packetSize", "delay"];
 
 for i = 1:length(scenarios)
@@ -23,7 +23,13 @@ for i = 1:length(scenarios)
     end
 end
 
+% extract stats
 statsTab = processDlPdcpStats(dlPdcpStats, scenarios, rows);
+
+% sort
+[scenarios, idx] = sort(scenarios);
+dlPdcpStats = dlPdcpStats(idx);
+statsTab = statsTab(idx, :);
 
 %% plot
 timeFig = figure();

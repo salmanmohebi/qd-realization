@@ -12,21 +12,28 @@ for i = 1:length(scenarios)
 end
 
 %% ns-3
-scenariosToPlot = ["refl1_qd0_relTh-15_floorMetal", "refl2_qd0_relTh-15_floorMetal"];
+folders = dir();
+folders(~[folders.isdir]) = [];
+folders({folders.name} == "Input") = [];
+folders({folders.name} == ".") = [];
+folders({folders.name} == "..") = [];
+scenariosToPlot = string({folders.name});
 
-figure
+
 for i = 1:length(scenariosToPlot)
+    figure
     idx = find(scenarios == scenariosToPlot(i));
     plotName = strrep(scenariosToPlot(i), '_', '\_');
     
     plot(sinr{idx}(1,:), sinr{idx}(2,:), 'DisplayName', plotName); hold on
-end
+    
 xlabel('t [s]')
 ylabel('SINR [dB]')
 legend('show', 'Location', 'best')
+end
 
 %% MATLAB vs ns-3
-scenario = "refl1_qd0_relTh-15_floorMetal";
+scenario = "refl2_qd0_relTh-25_floorMetal";
 ns3Idx = find(scenarios == scenariosToPlot(i));
 
 load(fullfile(scenario, 'NetworkResults/bfMode_SVD/SNR.mat'))
