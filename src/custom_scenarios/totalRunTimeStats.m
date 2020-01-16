@@ -3,10 +3,11 @@ close all
 clc
 
 %% process
-load('ns3SimTime.mat')
+campaign = "NistCallJanuaryInterference";
+load(fullfile(campaign, 'ns3SimTime.mat'))
 scenarios = getScenarios(dimension_labels{1}.scenario);
 
-load('runTimeTable2.mat');
+load(fullfile(campaign, 'runTimeTable2.mat'))
 rtRunTimeTab = runTimeTable;
 rtRunTimeTab.Properties.VariableNames{rtRunTimeTab.Properties.VariableNames == "runTime"} = 'rtRunTime';
 

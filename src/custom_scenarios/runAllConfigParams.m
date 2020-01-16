@@ -5,10 +5,12 @@ clc
 addpath('../..') % add src folder to path
 
 %% Parameters
-reflList = 3;
-switchQdList = 1;
+campaign = "NistCallJanuaryInterference";
+
+reflList = [1, 2, 3];
+switchQdList = [0, 1];
 relThList = [-Inf, -40, -25, -15];
-floorList = "Ceiling";
+floorList = ["Metal", "Ceiling"];
 
 %% Loop over all combinations of parameters
 tableVarNames = {'totalNumberOfReflections', 'switchQDGenerator',...
@@ -24,14 +26,14 @@ for refl = reflList
                 % setup scenario folder
                 scenarioName = sprintf('refl%d_qd%d_relTh%.0f_floor%s',...
                     refl, switchQd, relTh, floorMaterial);
-                scanarioPath = fullfile(pwd, scenarioName);
+                scanarioPath = fullfile(pwd, campaign, scenarioName);
                 
                 try
                     rmdir(scanarioPath, 's')
                 catch
                 end
                 mkdir(scanarioPath)
-                copyfile('Input', fullfile(scanarioPath, 'Input'), 'f')
+                copyfile(fullfile(campaign, 'Input'), fullfile(scanarioPath, 'Input'), 'f')
                 
                 % change cfg file
                 cfgFilePath = fullfile(scanarioPath, 'Input', 'paraCfgCurrent.txt');
@@ -51,7 +53,7 @@ for refl = reflList
                     'VariableNames', tableVarNames);
                 runTimeTable(end + 1, :) = tableRow;
                 
-                save('runTimeTable','runTimeTable')
+                save(fullfile(campaign, 'runTimeTable'), 'runTimeTable')
             end
         end
     end

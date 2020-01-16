@@ -3,7 +3,8 @@ close all
 clc
 
 %%
-load('runTimeTable3')
+campaign = "NistCallJanuaryInterference";
+load(fullfile(campaign, 'runTimeTable1'))
 
 for i = 1:size(runTimeTable, 2)-1
     figure

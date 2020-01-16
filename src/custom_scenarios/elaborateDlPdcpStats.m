@@ -3,7 +3,8 @@ close all
 clc
 
 %%
-load('dlPdcpStats.mat')
+campaign = "NistCallJanuaryIndoor1";
+load(fullfile(campaign, 'dlPdcpStats.mat'))
 
 targetCellId = 1;
 targetRnti = 1;
@@ -23,7 +24,13 @@ for i = 1:length(scenarios)
     end
 end
 
-statsTab = processDlPdcpStats(dlPdcpStats, scenarios, rows);
+% extract stats
+statsTab = processDlPdcpStats(dlPdcpStats, campaign, scenarios, rows);
+
+% sort
+[scenarios, idx] = sort(scenarios);
+dlPdcpStats = dlPdcpStats(idx);
+statsTab = statsTab(idx, :);
 
 %% plot
 timeFig = figure();
@@ -127,9 +134,9 @@ scenarios = split(scenarioStr, ', ');
 end
 
 
-function statsTab = processDlPdcpStats(dlPdcpStats, scenarios, rows)
+function statsTab = processDlPdcpStats(dlPdcpStats, campaign, scenarios, rows)
 
-load('ns3SimTime.mat')
+load(fullfile(campaign, 'ns3SimTime.mat'))
 
 statsTab = table();
 for i = 1:length(scenarios)
