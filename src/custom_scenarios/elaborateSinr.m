@@ -13,28 +13,37 @@ for i = 1:length(scenarios)
 end
 
 %% ns-3
+figure
 for i = 1:length(scenarios)
-    figure
     plotName = strrep(scenarios{i}, '_', '\_');
     
     plot(sinr{i}(1,:), sinr{i}(2,:), 'DisplayName', plotName); hold on
 
-    xlabel('t [s]')
-    ylabel('SINR [dB]')
-    legend('show', 'Location', 'best')
 end
+xlabel('t [s]')
+ylabel('SINR [dB]')
+legend('show', 'Location', 'best')
 
 %% MATLAB vs ns-3
-scenario = "refl2_qd0_relTh-Inf_floorMetal";
+scenario = "refl1_qd0_relTh-Inf_floorMetal";
+paraCfg = parameterCfg(fullfile(campaign, scenario));
+duration = paraCfg.totalTimeDuration;
+
+% ns-3
 ns3Idx = find(scenarios == scenario);
+ns3Out = sinr{ns3Idx}(1,:);
 
-load(fullfile(campaign, scenario, 'NetworkResults/bfMode_SVD/SNR.mat'))
-
-ns3_t = sinr{ns3Idx}(1,:);
+% matlab
+load(fullfile(campaign, sprintf('%s_matlab_stats', scenario)))
+matlab_t = linspace(0, duration, length(out.SINR_db) + 1);
+matlab_t = matlab_t(1:end-1);
 
 figure
-plot(ns3_t, sinr{ns3Idx}(2,:), 'DisplayName', 'ns-3 SINR'); hold on
-plot(linspace(0, max(ns3_t), length(SNR)), SNR, 'DisplayName', 'MATLAB SNR')
+plot(ns3Out, sinr{ns3Idx}(2,:), 'DisplayName', 'ns-3 SINR'); hold on
+stairs(matlab_t, out.SNR_db, 'DisplayName', 'MATLAB SNR')
+stairs(matlab_t, out.SINR_db, 'DisplayName', 'MATLAB SINR')
+
+title(strrep(scenario, '_', '\_'))
 legend('show','Location','best')
 
 
