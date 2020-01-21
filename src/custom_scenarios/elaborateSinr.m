@@ -9,7 +9,7 @@ scenarios = getScenarios(dimension_labels{1}.scenario);
 
 for i = 1:length(scenarios)
     % reduce unused dimensions
-    sinr{i} = vertcat(results{1,i,1,1,1,1,1,:});
+    sinr{i} = shiftdim(results(1,i,1,1,1,1,1,:,:));
 end
 
 %% ns-3
@@ -35,8 +35,8 @@ ns3Out = sinr{ns3Idx}(1,:);
 
 % matlab
 load(fullfile(campaign, sprintf('%s_matlab_stats', scenario)))
-matlab_t = linspace(0, duration, length(out.SINR_db) + 1);
-matlab_t = matlab_t(1:end-1);
+matlab_t = linspace(0, duration, length(out.SINR_db) + 2);
+matlab_t = matlab_t(1:end-2);
 
 figure
 plot(ns3Out, sinr{ns3Idx}(2,:), 'DisplayName', 'ns-3 SINR'); hold on
