@@ -2,6 +2,8 @@ function triangIdxs = generateReflectionList(previousReflectionList,...
     cadOp, visibilityMatrix)
 %GENERATEREFLECTIONLIST Given the the reflection list of the lower order,
 %generates the next order reflection list.
+%
+% SEE ALSO: GETVISIBILITYMATRIX
 
 
 % Copyright (c) 2019, University of Padova, Department of Information
@@ -34,7 +36,8 @@ for i = 1:prevListLen
     % index of the last reflecting triangle
     lastTriangIdx = previousReflectionList(i,end);
     % based on last reflection, list of next possible reflections
-    newListTriang = find(visibilityMatrix(:, lastTriangIdx));
+    % only triangle which are visible from lastTriangIdx AND which see lastTriangIdx
+    newListTriang = find(visibilityMatrix(lastTriangIdx, :) & visibilityMatrix(:, lastTriangIdx)');
     % add new possible reflections to previousReflectionList(i,:)
     % using cell arrays for convenience, later merged into a single matrix
     newListLen = size(newListTriang,1);
