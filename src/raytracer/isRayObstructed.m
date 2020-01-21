@@ -2,6 +2,8 @@ function isObstructed = isRayObstructed(p1, p2,...
     cadData, visibilityMatrix, triangIdxs)
 %ISRAYOBSTRUCTED Check if the segment [p1,p2] is obstructed by any triangle
 %contained in the CAD file. Partially robust to numeric approximations.
+%
+% SEE ALSO: GETVISIBILITYMATRIX
 
 
 % Copyright (c) 2019, University of Padova, Department of Information

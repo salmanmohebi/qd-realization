@@ -1,5 +1,8 @@
 function isInFront = isTriangleInFrontOfTriangle(t1, t2, strict)
-
+%ISTRIANGLEINFRONTOFTRIANGLE Check if any point of t1 is in the positive
+%half-plane described by triangle t2 and its normal vector.
+%
+% SEE ALSO: SIGNEDDISTANCEOFPOINTFROMPLANE
 points = [t1(1:3);...
     t1(4:6);...
     t1(7:9)];
