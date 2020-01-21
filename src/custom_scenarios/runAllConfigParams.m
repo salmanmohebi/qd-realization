@@ -2,7 +2,7 @@ clear
 close all
 clc
 
-addpath('../..') % add src folder to path
+addpath('..') % add src folder to path
 
 %% Parameters
 campaign = "NistCallJanuaryInterference";

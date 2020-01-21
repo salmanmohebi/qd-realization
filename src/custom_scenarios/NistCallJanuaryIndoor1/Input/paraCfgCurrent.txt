@@ -17,4 +17,4 @@ carrierFrequency	60e9
 qdFilesFloatPrecision	6
 minAbsolutePathGainThreshold	-Inf
 minRelativePathGainThreshold	-Inf
-materialLibraryPath	../../material_libraries/LectureRoomAllMaterialsMetalFloor.csv
+materialLibraryPath	../material_libraries/LectureRoomAllMaterialsMetalFloor.csv

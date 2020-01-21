@@ -18,4 +18,4 @@ qdFilesFloatPrecision	6
 useOptimizedOutputToFile	1
 minAbsolutePathGainThreshold	-Inf
 minRelativePathGainThreshold	-Inf
-materialLibraryPath	../../material_libraries/LectureRoomAllMaterialsMetalFloor.csv
+materialLibraryPath	../material_libraries/LectureRoomAllMaterialsMetalFloor.csv
