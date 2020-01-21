@@ -35,5 +35,11 @@ src/custom_scenarios/NistCallJanuaryInterference/*
 !src/custom_scenarios/NistCallJanuaryInterference/Input/
 !src/custom_scenarios/NistCallJanuaryInterference/runTimeTable*.mat
 
+!src/custom_scenarios/
+src/custom_scenarios/*
+!src/custom_scenarios/ParkingLot/
+src/custom_scenarios/ParkingLot/*
+!src/custom_scenarios/ParkingLot/Input/
+
 # Do NOT ignore QD traces generation and output processing scripts
 !/src/custom_scenarios/*.m
