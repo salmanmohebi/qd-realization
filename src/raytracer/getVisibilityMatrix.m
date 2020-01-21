@@ -29,6 +29,8 @@ for i = 1:nTriangles
     end
 end
 
-visibilityMatrix = sparse(rows, cols, true(size(rows)));
+visibilityMatrix = sparse(rows, cols,...
+    true(size(rows)),...
+    nTriangles, nTriangles);
 
 end
