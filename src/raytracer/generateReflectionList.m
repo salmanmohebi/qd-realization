@@ -37,7 +37,7 @@ for i = 1:prevListLen
     lastTriangIdx = previousReflectionList(i,end);
     % based on last reflection, list of next possible reflections
     % only triangle which are visible from lastTriangIdx AND which see lastTriangIdx
-    newListTriang = find(visibilityMatrix(lastTriangIdx, :) & visibilityMatrix(:, lastTriangIdx)');
+    newListTriang = find(visibilityMatrix(lastTriangIdx, :).' & visibilityMatrix(:, lastTriangIdx));
     % add new possible reflections to previousReflectionList(i,:)
     % using cell arrays for convenience, later merged into a single matrix
     newListLen = size(newListTriang,1);
