@@ -1,12 +1,12 @@
 ParameterName	ParameterValue
-environmentFileName	ParkingLot6.xml
+environmentFileName	ParkingLot6_extendedGround.xml
 generalizedScenario	1
 indoorSwitch	0
 mobilitySwitch	1
 mobilityType	2
 numberOfNodes	2
 numberOfTimeDivisions	10
-referencePoint	[3,3,2]
+referencePoint	[0,0,0]
 selectPlanesByDist	80
 switchQDGenerator	0
 switchRandomization	0
