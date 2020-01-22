@@ -23,20 +23,22 @@
 # Do NOT ignore main experiment files
 !src/custom_scenarios/
 src/custom_scenarios/*
+
 !src/custom_scenarios/NistCallJanuaryIndoor1/
 src/custom_scenarios/NistCallJanuaryIndoor1/*
 !src/custom_scenarios/NistCallJanuaryIndoor1/Input/
 !src/custom_scenarios/NistCallJanuaryIndoor1/runTimeTable*.mat
 
-!src/custom_scenarios/
-src/custom_scenarios/*
 !src/custom_scenarios/NistCallJanuaryInterference/
 src/custom_scenarios/NistCallJanuaryInterference/*
 !src/custom_scenarios/NistCallJanuaryInterference/Input/
 !src/custom_scenarios/NistCallJanuaryInterference/runTimeTable*.mat
 
-!src/custom_scenarios/
-src/custom_scenarios/*
+!src/custom_scenarios/IwcmcIndoor1/
+src/custom_scenarios/IwcmcIndoor1/*
+!src/custom_scenarios/IwcmcIndoor1/Input/
+!src/custom_scenarios/IwcmcIndoor1/runTimeTable*.mat
+
 !src/custom_scenarios/ParkingLot/
 src/custom_scenarios/ParkingLot/*
 !src/custom_scenarios/ParkingLot/Input/
