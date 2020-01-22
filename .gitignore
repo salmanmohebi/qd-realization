@@ -34,6 +34,11 @@ src/custom_scenarios/NistCallJanuaryInterference/*
 !src/custom_scenarios/NistCallJanuaryInterference/Input/
 !src/custom_scenarios/NistCallJanuaryInterference/runTimeTable*.mat
 
+!src/custom_scenarios/IwcmcLroom/
+src/custom_scenarios/IwcmcLroom/*
+!src/custom_scenarios/IwcmcLroom/Input/
+!src/custom_scenarios/IwcmcLroom/runTimeTable*.mat
+
 !src/custom_scenarios/IwcmcIndoor1/
 src/custom_scenarios/IwcmcIndoor1/*
 !src/custom_scenarios/IwcmcIndoor1/Input/
