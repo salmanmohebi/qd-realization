@@ -31,26 +31,6 @@ plotRunTime(matlabRtNetRunTimeTab, 'matlabRtNetSimTime', 'minRelativePathGainThr
 
 
 %% Utils
-function scenarios = getScenarios(scenarioStr)
-scenarioStr = scenarioStr(2:end-1);
-scenarioStr = strrep(scenarioStr,'''',''); % remove '
-scenarios = split(scenarioStr, ', ');
-end
-
-
-function tab = getScenarioTab(scenario)
-
-t = regexp(scenario, 'refl(.+)_qd(.+)_relTh(.+)_floor(.+)', 'tokens');
-
-totalNumberOfReflections = str2double(t{1}{1});
-switchQDGenerator = str2double(t{1}{2});
-minRelativePathGainThreshold = str2double(t{1}{3});
-floorMaterial = string(t{1}{4});
-
-tab = table(totalNumberOfReflections, switchQDGenerator, minRelativePathGainThreshold, floorMaterial);
-
-end
-
 function matlabRtNetRunTimeTab = getMatlabNetRunTimeTab(rtNetResults)
 
 matlabRtNetRunTimeTab  = table();
