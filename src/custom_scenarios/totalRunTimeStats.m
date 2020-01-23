@@ -3,88 +3,37 @@ close all
 clc
 
 %% process
-campaign = "NistCallJanuaryInterference";
-load(fullfile(campaign, 'ns3SimTime.mat'))
-scenarios = getScenarios(dimension_labels{1}.scenario);
+campaign = "IwcmcLroom";
+rtNetMatFile = 'matlab_stats_64_1.mat';
+qdRunTimeFile = 'runTimeTable.mat';
 
-load(fullfile(campaign, 'runTimeTable2.mat'))
+load(fullfile(campaign, rtNetMatFile))
+load(fullfile(campaign, qdRunTimeFile))
+
+% pre-processing
 rtRunTimeTab = runTimeTable;
 rtRunTimeTab.Properties.VariableNames{rtRunTimeTab.Properties.VariableNames == "runTime"} = 'rtRunTime';
 
-ns3RunTimeTab = table();
-for i = 1:length(scenarios)
-    ns3RunTimeTab(end+1, :) = getScenarioTab(scenarios{i});
-end
-ns3RunTimeTab.ns3RunTime = shiftdim(results);
+matlabRtNetRunTimeTab = getMatlabNetRunTimeTab(rtNetResults);
 
-runTimeTab = join(rtRunTimeTab, ns3RunTimeTab,...
+% join tables
+runTimeTab = join(rtRunTimeTab, matlabRtNetRunTimeTab,...
     'Keys', ["totalNumberOfReflections", "switchQDGenerator", "minRelativePathGainThreshold", "floorMaterial"]);
 
-runTimeTab.totRunTime = runTimeTab.rtRunTime + runTimeTab.ns3RunTime;
 
 %% Plot
 % RT
-figure
-boxplot(runTimeTab.rtRunTime, runTimeTab.totalNumberOfReflections)
-xlabel('Number of reflections')
-ylabel('RT simulation time [s]')
+plotRunTime(runTimeTab, 'rtRunTime', 'totalNumberOfReflections', 'Number of Reflections', 'RT Simulation Time [s]')
+% plotRunTime(runTimeTab, 'rtRunTime', 'switchQDGenerator', 'QD Switch', 'RT Simulation Time [s]')
+plotRunTime(runTimeTab, 'rtRunTime', 'minRelativePathGainThreshold', 'Relative Threshold [dB]', 'RT Simulation Time [s]')
+% plotRunTime(runTimeTab, 'rtRunTime', 'floorMaterial', 'Floor Material', 'RT Simulation Time [s]')
 
-figure
-boxplot(runTimeTab.rtRunTime, runTimeTab.switchQDGenerator)
-xlabel('QD switch')
-ylabel('RT simulation time [s]')
+% Matlab net
+plotRunTime(runTimeTab, 'matlabRtNetSimTime', 'totalNumberOfReflections', 'Number of Reflections', 'MATLAB Net. Sim. Time [s]')
+% plotRunTime(runTimeTab, 'matlabRtNetSimTime', 'switchQDGenerator', 'QD Switch', 'MATLAB Net. Sim. Time [s]')
+plotRunTime(runTimeTab, 'matlabRtNetSimTime', 'minRelativePathGainThreshold', 'Relative Threshold [dB]', 'MATLAB Net. Sim. Time [s]')
+% plotRunTime(runTimeTab, 'matlabRtNetSimTime', 'floorMaterial', 'Floor Material', 'MATLAB Net. Sim. Time [s]')
 
-figure
-boxplot(runTimeTab.rtRunTime, runTimeTab.minRelativePathGainThreshold)
-xlabel('Relative Threshold [dB]')
-ylabel('RT simulation time [s]')
-
-figure
-boxplot(runTimeTab.rtRunTime, runTimeTab.floorMaterial)
-xlabel('Floor Material')
-ylabel('RT simulation time [s]')
-
-% ns-3
-figure
-boxplot(runTimeTab.ns3RunTime, runTimeTab.totalNumberOfReflections)
-xlabel('Number of reflections')
-ylabel('Ns-3 simulation time [s]')
-
-figure
-boxplot(runTimeTab.ns3RunTime, runTimeTab.switchQDGenerator)
-xlabel('QD switch')
-ylabel('Ns-3 simulation time [s]')
-
-figure
-boxplot(runTimeTab.ns3RunTime, runTimeTab.minRelativePathGainThreshold)
-xlabel('Relative Threshold [dB]')
-ylabel('Ns-3 simulation time [s]')
-
-figure
-boxplot(runTimeTab.ns3RunTime, runTimeTab.floorMaterial)
-xlabel('Floor Material')
-ylabel('Ns-3 simulation time [s]')
-
-% Total
-figure
-boxplot(runTimeTab.totRunTime, runTimeTab.totalNumberOfReflections)
-xlabel('Number of reflections')
-ylabel('Totale simulation time [s]')
-
-figure
-boxplot(runTimeTab.totRunTime, runTimeTab.switchQDGenerator)
-xlabel('QD switch')
-ylabel('Totale simulation time [s]')
-
-figure
-boxplot(runTimeTab.totRunTime, runTimeTab.minRelativePathGainThreshold)
-xlabel('Relative Threshold [dB]')
-ylabel('Totale simulation time [s]')
-
-figure
-boxplot(runTimeTab.totRunTime, runTimeTab.floorMaterial)
-xlabel('Floor Material')
-ylabel('Totale simulation time [s]')
 
 %% Utils
 function scenarios = getScenarios(scenarioStr)
@@ -92,6 +41,7 @@ scenarioStr = scenarioStr(2:end-1);
 scenarioStr = strrep(scenarioStr,'''',''); % remove '
 scenarios = split(scenarioStr, ', ');
 end
+
 
 function tab = getScenarioTab(scenario)
 
@@ -103,5 +53,26 @@ minRelativePathGainThreshold = str2double(t{1}{3});
 floorMaterial = string(t{1}{4});
 
 tab = table(totalNumberOfReflections, switchQDGenerator, minRelativePathGainThreshold, floorMaterial);
+
+end
+
+function matlabRtNetRunTimeTab = getMatlabNetRunTimeTab(rtNetResults)
+
+matlabRtNetRunTimeTab  = table();
+for i = 1:length(rtNetResults)
+    scenarioTab = getScenarioTab(rtNetResults(i).scenario);
+    scenarioTab.matlabRtNetSimTime = rtNetResults(i).fullSimTime;
+    
+    matlabRtNetRunTimeTab = [matlabRtNetRunTimeTab; scenarioTab];
+end
+
+end
+
+function plotRunTime(tab, runTimeField, categoryField, xLabel, yLabel)
+
+figure
+boxplot(tab.(runTimeField), tab.(categoryField))
+xlabel(xLabel)
+ylabel(yLabel)
 
 end
