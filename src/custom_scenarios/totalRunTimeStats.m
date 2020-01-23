@@ -16,23 +16,18 @@ rtRunTimeTab.Properties.VariableNames{rtRunTimeTab.Properties.VariableNames == "
 
 matlabRtNetRunTimeTab = getMatlabNetRunTimeTab(rtNetResults);
 
-% join tables
-runTimeTab = join(rtRunTimeTab, matlabRtNetRunTimeTab,...
-    'Keys', ["totalNumberOfReflections", "switchQDGenerator", "minRelativePathGainThreshold", "floorMaterial"]);
-
-
 %% Plot
 % RT
-plotRunTime(runTimeTab, 'rtRunTime', 'totalNumberOfReflections', 'Number of Reflections', 'RT Simulation Time [s]')
-% plotRunTime(runTimeTab, 'rtRunTime', 'switchQDGenerator', 'QD Switch', 'RT Simulation Time [s]')
-plotRunTime(runTimeTab, 'rtRunTime', 'minRelativePathGainThreshold', 'Relative Threshold [dB]', 'RT Simulation Time [s]')
-% plotRunTime(runTimeTab, 'rtRunTime', 'floorMaterial', 'Floor Material', 'RT Simulation Time [s]')
+plotRunTime(rtRunTimeTab, 'rtRunTime', 'totalNumberOfReflections', 'Number of Reflections', 'RT Simulation Time [s]')
+% plotRunTime(rtRunTimeTab, 'rtRunTime', 'switchQDGenerator', 'QD Switch', 'RT Simulation Time [s]')
+plotRunTime(rtRunTimeTab, 'rtRunTime', 'minRelativePathGainThreshold', 'Relative Threshold [dB]', 'RT Simulation Time [s]')
+% plotRunTime(rtRunTimeTab, 'rtRunTime', 'floorMaterial', 'Floor Material', 'RT Simulation Time [s]')
 
 % Matlab net
-plotRunTime(runTimeTab, 'matlabRtNetSimTime', 'totalNumberOfReflections', 'Number of Reflections', 'MATLAB Net. Sim. Time [s]')
-% plotRunTime(runTimeTab, 'matlabRtNetSimTime', 'switchQDGenerator', 'QD Switch', 'MATLAB Net. Sim. Time [s]')
-plotRunTime(runTimeTab, 'matlabRtNetSimTime', 'minRelativePathGainThreshold', 'Relative Threshold [dB]', 'MATLAB Net. Sim. Time [s]')
-% plotRunTime(runTimeTab, 'matlabRtNetSimTime', 'floorMaterial', 'Floor Material', 'MATLAB Net. Sim. Time [s]')
+plotRunTime(matlabRtNetRunTimeTab, 'matlabRtNetSimTime', 'totalNumberOfReflections', 'Number of Reflections', 'MATLAB Net. Sim. Time [s]')
+% plotRunTime(matlabRtNetRunTimeTab, 'matlabRtNetSimTime', 'switchQDGenerator', 'QD Switch', 'MATLAB Net. Sim. Time [s]')
+plotRunTime(matlabRtNetRunTimeTab, 'matlabRtNetSimTime', 'minRelativePathGainThreshold', 'Relative Threshold [dB]', 'MATLAB Net. Sim. Time [s]')
+% plotRunTime(matlabRtNetRunTimeTab, 'matlabRtNetSimTime', 'floorMaterial', 'Floor Material', 'MATLAB Net. Sim. Time [s]')
 
 
 %% Utils
