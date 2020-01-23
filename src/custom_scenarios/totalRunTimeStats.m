@@ -43,11 +43,16 @@ end
 
 end
 
+
 function plotRunTime(tab, runTimeField, categoryField, xLabel, yLabel)
 
 figure
 boxplot(tab.(runTimeField), tab.(categoryField))
 xlabel(xLabel)
 ylabel(yLabel)
+
+% do not allow negative time
+ax = gca;
+ax.YLim(1) = max(0, ax.YLim(1));
 
 end
