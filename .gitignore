@@ -45,6 +45,11 @@ src/custom_scenarios/IwcmcIndoor1/*
 !src/custom_scenarios/IwcmcIndoor1/Input/
 !src/custom_scenarios/IwcmcIndoor1/runTimeTable*.mat
 
+!src/custom_scenarios/IwcmcParkingLot/
+src/custom_scenarios/IwcmcParkingLot/*
+!src/custom_scenarios/IwcmcParkingLot/Input/
+!src/custom_scenarios/IwcmcParkingLot/runTimeTable*.mat
+
 !src/custom_scenarios/ParkingLot/
 src/custom_scenarios/ParkingLot/*
 !src/custom_scenarios/ParkingLot/Input/
