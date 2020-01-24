@@ -31,19 +31,6 @@ plotRunTime(matlabRtNetRunTimeTab, 'matlabRtNetSimTime', 'minRelativePathGainThr
 
 
 %% Utils
-function matlabRtNetRunTimeTab = getMatlabNetRunTimeTab(rtNetResults)
-
-matlabRtNetRunTimeTab  = table();
-for i = 1:length(rtNetResults)
-    scenarioTab = getScenarioTab(rtNetResults(i).scenario);
-    scenarioTab.matlabRtNetSimTime = rtNetResults(i).fullSimTime;
-    
-    matlabRtNetRunTimeTab = [matlabRtNetRunTimeTab; scenarioTab];
-end
-
-end
-
-
 function plotRunTime(tab, runTimeField, categoryField, xLabel, yLabel)
 
 figure
