@@ -61,11 +61,12 @@ for campaign = campaigns
         plot(x, y, 'DisplayName', plotName); hold on
         
     end
-    figure(cdfFig)
-    xlabel(['x = ', ratio, ' [dB]'])
-    ylabel('F(x)')
-    legend('show', 'Location', 'best')
+    
 end
+xlabel(['x = ', ratio, ' [dB]'])
+ylabel('F(x)')
+legend('show', 'Location', 'best')
+
 
 %% Time boxplot
 campaign = "IwcmcLroom";
@@ -121,12 +122,14 @@ xlabel('Relative Threshold [dB]')
 ylabel('MATLAB Net. Sim. Time [s]')
 
 %% Correlation plots
-numRuns = 10000;
+numRuns = 1000;
 
 campaigns = ["IwcmcParkingLot", "IwcmcLroom"];
 for campaign = campaigns
     load(fullfile(campaign, rtNetMatFile))
     load(fullfile(campaign, qdRunTimeFile))
+    
+    rtRunTimeTab = runTimeTable;
     
     ratio = 'SNR';
     switch(campaign)
@@ -147,8 +150,8 @@ for campaign = campaigns
         scenarioTab = getScenarioTab(rtNetResults(i).scenario);
         scenarioIdx = find(all(rtRunTimeTab{:,1:4} == scenarioTab{:,:}, 2));
         
-        rtNetResults(i).rtRunTime = rtRunTimeTab.rtRunTime(scenarioIdx);
-        rtNetResults(i).exampleCampaignRunTime = rtRunTimeTab.rtRunTime(scenarioIdx) + numRuns*rtNetResults(i).fullSimTime;
+        rtNetResults(i).rtRunTime = rtRunTimeTab.runTime(scenarioIdx);
+        rtNetResults(i).exampleCampaignRunTime = rtRunTimeTab.runTime(scenarioIdx) + numRuns*rtNetResults(i).fullSimTime;
     end
     
     % MATLAB RT-Net
@@ -173,7 +176,7 @@ for campaign = campaigns
         
     end
     xlabel(sprintf('%s NRMSE', ratio))
-    ylabel('MATLAB Net. Sim. Time [s]')
+    ylabel('Speedup')
     title(sprintf('%s (%d runs)', campaign, numRuns))
     
     % legend
