@@ -31,6 +31,15 @@ xlabel('t [s]')
 ylabel([ratio, ' [dB]'])
 legend('show', 'Location', 'best')
 
+% save figure
+figName = sprintf('%s_time_%s',ratio, campaign);
+
+savefig(figName);
+
+cleanfigure;
+matlab2tikz(figName, 'width', '\fwidth', 'height', '\fheight');
+
+
 %% CDF on refl for all scenarios
 
 campaigns = ["IwcmcLroom", "IwcmcIndoor1", "IwcmcParkingLot"];
@@ -68,6 +77,15 @@ ylabel('F(x)')
 legend('show', 'Location', 'best')
 
 
+% save figure
+figName = sprintf('%s_cdf_allCampaigns',ratio);
+
+savefig(figName);
+
+cleanfigure;
+matlab2tikz(figName, 'width', '\fwidth', 'height', '\fheight');
+
+
 %% Time boxplot
 campaign = "IwcmcLroom";
 
@@ -81,8 +99,8 @@ rtRunTimeTab.Properties.VariableNames{rtRunTimeTab.Properties.VariableNames == "
 matlabRtNetRunTimeTab = getMatlabNetRunTimeTab(rtNetResults);
 
 % matlabRtNetRunTimeTab.floorMaterial{matlabRtNetRunTimeTab.floorMaterial == "Metal___check"} = 'Metal';
-matlabRtNetRunTimeTab(matlabRtNetRunTimeTab.totalNumberOfReflections == 4,:) = [];
-rtRunTimeTab(rtRunTimeTab.totalNumberOfReflections == 4, :) = [];
+% matlabRtNetRunTimeTab(matlabRtNetRunTimeTab.totalNumberOfReflections == 4,:) = [];
+% rtRunTimeTab(rtRunTimeTab.totalNumberOfReflections == 4, :) = [];
 
 if campaign == "IwcmcParkingLot"
     rtNetResults(9:end) = [];
@@ -92,18 +110,27 @@ end
 % Refl
 figure
 boxplot(rtRunTimeTab.rtRunTime / 60, rtRunTimeTab.totalNumberOfReflections,...
-    'PlotStyle', 'compact', 'Positions', (1:3)-0.1, 'Colors', 'k')
+    'PlotStyle', 'compact', 'Positions', (1:4)-0.1, 'Colors', 'k')
 ylabel('RT Simulation Time [min]')
 ax = gca;
 ax.YLim(1) = max(0, ax.YLim(1));
 
 yyaxis right
 boxplot(matlabRtNetRunTimeTab.matlabRtNetSimTime, matlabRtNetRunTimeTab.totalNumberOfReflections,...
-    'PlotStyle', 'compact', 'Positions', (1:3)+0.1, 'Colors', 'r')
+    'PlotStyle', 'compact', 'Positions', (1:4)+0.1, 'Colors', 'r')
 set(gca, 'YColor', 'r')
 
 xlabel('Number of Reflections')
 ylabel('MATLAB Net. Sim. Time [s]')
+
+% save figure
+figName = 'runtimeBoxplots_refl';
+
+savefig(figName);
+
+cleanfigure;
+matlab2tikz(figName, 'width', '\fwidth', 'height', '\fheight');
+
 
 % RelTh
 figure
@@ -120,6 +147,15 @@ set(gca, 'YColor', 'r')
 
 xlabel('Relative Threshold [dB]')
 ylabel('MATLAB Net. Sim. Time [s]')
+
+% save figure
+figName = 'runtimeBoxplots_relTh';
+
+savefig(figName);
+
+cleanfigure;
+matlab2tikz(figName, 'width', '\fwidth', 'height', '\fheight');
+
 
 %% Correlation plots
 numRuns = 1000;
@@ -197,6 +233,15 @@ for campaign = campaigns
         leg = [leg, sprintf("Rel. Thresh.: %.0f", relTh)];
     end
     legend(p, leg, 'Location', 'best', 'NumColumns', 2)
+    
+    % save figure
+    figName = sprintf('corrplot_%s_%s', ratio, campaign);
+    
+    savefig(figName);
+    
+    cleanfigure;
+    matlab2tikz(figName, 'width', '\fwidth', 'height', '\fheight');
+    
 end
 
 % Utils
