@@ -40,8 +40,8 @@ function [CADop, switchMaterial, visibilityMatrix, minDistMatrix] =...
 
 % Importing CAD/AMF/XML files is very slow, especially for large scenarios
 % Check first if cached
-cacheFilePath = strcat(inputPath, '/cachedCadOutput.mat');
-environmentFilePath = strcat(inputPath, '/', environmentFileName);
+cacheFilePath = fullfile(inputPath, 'cachedCadOutput.mat');
+environmentFilePath = fullfile(inputPath, environmentFileName);
 
 if exist(cacheFilePath, 'file')
     cacheAttribs = dir(cacheFilePath);
@@ -88,7 +88,7 @@ if exist(cacheFilePath, 'file')
 end
 
 % Cache either does not exist or outdated
-tmpXmlFilePath = strcat(inputPath, '/CADFile.xml');
+tmpXmlFilePath = fullfile(inputPath, 'CADFile.xml');
 
 [~,~,extension] = fileparts(environmentFileName);
 switch(extension(2:end))
