@@ -119,12 +119,6 @@ Rx = nodeLoc(2,:);
 vtx = nodeVelocities(1,:);
 vrx = nodeVelocities(2,:);
 
-switchPolarization = 0;
-switchCp = 0;
-
-polarizationTx = [1, 0];
-polarizationRx = [1, 0];
-
 MaterialLibrary = importMaterialLibrary(paraCfgInput.materialLibraryPath);
 
 % Extracting CAD file and storing in an XMl file, CADFile.xml
@@ -190,9 +184,6 @@ for iterateTimeDivision = 1:paraCfgInput.numberOfTimeDivisions
     % Iterates through all the nodes
     for iterateTx = 1:paraCfgInput.numberOfNodes
         for iterateRx = iterateTx+1:paraCfgInput.numberOfNodes
-            % reset output
-            output = [];
-            
             % update positions and velocities
             Tx = nodeLoc(iterateTx, :);
             Rx = nodeLoc(iterateRx, :);
