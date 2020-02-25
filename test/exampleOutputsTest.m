@@ -51,7 +51,12 @@ addpath(srcFolder,...
     fullfile(srcFolder, 'raytracer'),...
     fullfile(srcFolder,'utils'))
 
-testCase.TestData.examplesFolderPath = fullfile(srcFolder,'examples');
+cd(srcFolder)
+testCase.TestData.examplesFolderPath = 'examples';
+end
+
+function teardownOnce(testCase)
+cd(testCase.TestData.testFolderPath)
 end
 
 
