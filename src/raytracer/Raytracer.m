@@ -65,12 +65,6 @@ function outputPath = Raytracer(paraCfgInput, nodeCfgInput)
 
 
 %% Input Parameters Management
-mobilitySwitch = paraCfgInput.mobilitySwitch;
-mobilityType = paraCfgInput.mobilityType;
-numberOfNodes = paraCfgInput.numberOfNodes;
-numberOfTimeDivisions = paraCfgInput.numberOfTimeDivisions;
-switchRandomization = paraCfgInput.switchRandomization;
-
 nodeLoc = nodeCfgInput.nodeLoc;
 nodeVelocities = nodeCfgInput.nodeVelocities;
 
@@ -82,18 +76,18 @@ if paraCfgInput.switchQDGenerator &&...
 end
 
 % List of paths
-inputPath = strcat(paraCfgInput.inputScenarioName, '/Input');
-outputPath = strcat(paraCfgInput.inputScenarioName, '/Output');
+inputPath = fullfile(paraCfgInput.inputScenarioName, 'Input');
+outputPath = fullfile(paraCfgInput.inputScenarioName, 'Output');
 
-ns3Path = strcat(outputPath, '/Ns3');
-qdFilesPath = strcat(ns3Path, '/QdFiles');
+ns3Path = fullfile(outputPath, 'Ns3');
+qdFilesPath = fullfile(ns3Path, 'QdFiles');
 
-if paraCfgInput.switchSaveVisualizerFiles
-    visualizerPath = strcat(outputPath, '/Visualizer');
+if paraCfgInput.switchSaveVisualizerFiles == 1
+    visualizerPath = fullfile(outputPath, 'Visualizer');
     
-    nodePositionsPath = strcat(visualizerPath, '/NodePositions');
-    roomCoordinatesPath = strcat(visualizerPath, '/RoomCoordinates');
-    mpcCoordinatesPath = strcat(visualizerPath, '/MpcCoordinates');
+    nodePositionsPath = fullfile(visualizerPath, 'NodePositions');
+    roomCoordinatesPath = fullfile(visualizerPath, 'RoomCoordinates');
+    mpcCoordinatesPath = fullfile(visualizerPath, 'MpcCoordinates');
 end
 
 % Subfolders creation
@@ -116,14 +110,20 @@ if paraCfgInput.switchSaveVisualizerFiles
 end
 
 % Init output files
-fids = getQdFilesIds(qdFilesPath, numberOfNodes,...
+fids = getQdFilesIds(qdFilesPath, paraCfgInput.numberOfNodes,...
     paraCfgInput.useOptimizedOutputToFile);
 
-
+%% Init
 Tx = nodeLoc(1,:);
 Rx = nodeLoc(2,:);
 vtx = nodeVelocities(1,:);
 vrx = nodeVelocities(2,:);
+
+switchPolarization = 0;
+switchCp = 0;
+
+polarizationTx = [1, 0];
+polarizationRx = [1, 0];
 
 MaterialLibrary = importMaterialLibrary(paraCfgInput.materialLibraryPath);
 
@@ -133,86 +133,85 @@ MaterialLibrary = importMaterialLibrary(paraCfgInput.materialLibraryPath);
     paraCfgInput.referencePoint, paraCfgInput.selectPlanesByDist,...
     paraCfgInput.indoorSwitch);
 
-if paraCfgInput.switchSaveVisualizerFiles
+if paraCfgInput.switchSaveVisualizerFiles == 1
     % Save output file with room coordinates for visualization
     RoomCoordinates = CADop(:, 1:9);
-    csvwrite(sprintf('%s/RoomCoordinates.csv',roomCoordinatesPath),...
+    csvwrite(fullfile(roomCoordinatesPath, 'RoomCoordinates.csv'),...
         RoomCoordinates);
 end
 
-% Randomization
-%if number of nodes is greater than 1 or switch_randomization is set to 1,
-%the program generates nodes randomly. If one has more than 2 nodes but
-%know the exact locations of nodes, then disable this if statement and
-%replace node and node_v with the values of node positions and node
-%velocities repsectively
+%% Randomization
+% if number of nodes is greater than 1 or switch_randomization is set to 1,
+% the program generates nodes randomly. If one has more than 2 nodes but
+% know the exact locations of nodes, then disable this if statement and
+% replace node and node_v with the values of node positions and node
+% velocities repsectively
 
 TxInitial = Tx;
 RxInitial = Rx;
 % t - total time period, n - number of divisions
-if mobilitySwitch
-    timeDivisionValue = paraCfgInput.totalTimeDuration / paraCfgInput.numberOfTimeDivisions;
-else
-    numberOfTimeDivisions = 0;
-    timeDivisionValue = 0;
-end
+timeDivisionValue = paraCfgInput.totalTimeDuration / paraCfgInput.numberOfTimeDivisions;
 
 % Finite difference method to simulate mobility. x=x0 + v*dt.
 % This method ensures the next position wouldnt collide with any of the
 % planes. If that occurs then the velocities are simply reversed (not
 % reflected). At every time step the positions of all nodes are updated
-
-for iterateTimeDivision = 0:numberOfTimeDivisions
-    if mobilityType == 1
-        if numberOfNodes == 2
-            [nodeLoc,Tx,Rx,vtx, vrx, nodeVelocities] = LinearMobility...
-                (numberOfNodes, switchRandomization, ...
-                iterateTimeDivision, nodeLoc, nodeVelocities, vtx,...
+for iterateTimeDivision = 1:paraCfgInput.numberOfTimeDivisions
+    % update mobility
+    if paraCfgInput.mobilityType == 1
+        if paraCfgInput.numberOfNodes == 2
+            [nodeLoc, Tx, Rx, vtx, vrx, nodeVelocities] = LinearMobility...
+                (paraCfgInput.numberOfNodes, paraCfgInput.switchRandomization, ...
+                iterateTimeDivision-1, nodeLoc, nodeVelocities, vtx,...
                 vrx,TxInitial, RxInitial, timeDivisionValue,...
                 CADop, Tx, Rx);
         else
-            [nodeLoc,Tx,Rx,vtx, vrx, nodeVelocities] = LinearMobility...
-                (numberOfNodes, switchRandomization,...
-                iterateTimeDivision, nodeLoc, nodeVelocities,...
+            [nodeLoc, Tx, Rx, vtx, vrx, nodeVelocities] = LinearMobility...
+                (paraCfgInput.numberOfNodes, paraCfgInput.switchRandomization,...
+                iterateTimeDivision-1, nodeLoc, nodeVelocities,...
                 [], [], TxInitial, RxInitial, timeDivisionValue, ...
                 CADop, Tx, Rx);
         end
         
-    elseif mobilityType == 2
+    elseif paraCfgInput.mobilityType == 2
         [nodeLoc, nodeVelocities] = NodeExtractor...
-            (numberOfNodes,  switchRandomization, ...
-            iterateTimeDivision, nodeLoc, nodeVelocities, nodeCfgInput.nodePosition, timeDivisionValue);
+            (paraCfgInput.numberOfNodes,  paraCfgInput.switchRandomization, ...
+            iterateTimeDivision, nodeLoc, nodeVelocities,...
+            nodeCfgInput.nodePosition, timeDivisionValue);
     end
     
-    if paraCfgInput.switchSaveVisualizerFiles && mobilitySwitch >=0
-        csvwrite(sprintf('%s/NodePositionsTrc%d.csv',...
-            nodePositionsPath, iterateTimeDivision),...
+    % save NodePositionsTrc
+    if paraCfgInput.switchSaveVisualizerFiles
+        filename = sprintf('NodePositionsTrc%d.csv', iterateTimeDivision-1);
+        csvwrite(fullfile(nodePositionsPath, filename),...
             nodeLoc);
     end
     
     % Iterates through all the nodes
-    for iterateTx = 1:numberOfNodes
-        for iterateRx = iterateTx+1:numberOfNodes
+    for iterateTx = 1:paraCfgInput.numberOfNodes
+        for iterateRx = iterateTx+1:paraCfgInput.numberOfNodes
+            % reset output
+            output = [];
             
-            if numberOfNodes >= 2 || switchRandomization
-                Tx = nodeLoc(iterateTx, :);
-                Rx = nodeLoc(iterateRx, :);
-                
-                vtx = nodeVelocities(iterateTx, :);
-                vrx = nodeVelocities(iterateRx, :);
-            end
-                
+            % update positions and velocities
+            Tx = nodeLoc(iterateTx, :);
+            Rx = nodeLoc(iterateRx, :);
+            
+            vtx = nodeVelocities(iterateTx, :);
+            vrx = nodeVelocities(iterateRx, :);
+            
+
             % LOS Path generation
             [output, rayVertices] = computeLosOutput(Rx, Tx, vrx, vtx,...
                 CADop, paraCfgInput.carrierFrequency);
             
             if paraCfgInput.switchSaveVisualizerFiles &&...
-                    ~isempty(output) &&...
-                    iterateTx < iterateRx
+                    ~isempty(output)
                 
-                csvwrite(sprintf('%s/MpcTx%dRx%dRefl%dTrc%d.csv',...
-                    mpcCoordinatesPath, iterateTx-1, iterateRx-1, 0, iterateTimeDivision),...
-                    rayVertices); 
+                filename = sprintf('MpcTx%dRx%dRefl%dTrc%d.csv',...
+                    iterateTx-1, iterateRx-1, 0, iterateTimeDivision-1);
+                csvwrite(fullfile(mpcCoordinatesPath, filename),...
+                    rayVertices);
 
             end
                 
@@ -222,24 +221,21 @@ for iterateTimeDivision = 0:numberOfTimeDivisions
                 triangReflIdxList = generateReflectionList(...
                     triangReflIdxList, CADop, visibilityMatrix);
                 
-                if mobilitySwitch == -1 % ??
-                    vtx = [0, 0, 0];
-                    vrx = vtx;
-                end
-                
-                [outputTmp, rayVertices] = mymultipath(Rx, Tx, vrx,vtx,...
+                [outputTmp, rayVertices] = mymultipath(Rx, Tx, vrx, vtx,...
                     triangReflIdxList, CADop, visibilityMatrix,...
                     MaterialLibrary, paraCfgInput.switchQDGenerator,...
                     switchMaterial, paraCfgInput.carrierFrequency);
                         
                 if paraCfgInput.switchSaveVisualizerFiles &&...
                         iterateTx < iterateRx &&...
-                        size(rayVertices,1) ~= 0
-                    
-                    csvwrite(sprintf('%s/MpcTx%dRx%dRefl%dTrc%d.csv',...
-                        mpcCoordinatesPath, iterateTx-1, iterateRx-1,...
-                        iterateOrderOfReflection, iterateTimeDivision),...
+                        size(rayVertices, 1) ~= 0
+
+                    filename = sprintf('MpcTx%dRx%dRefl%dTrc%d.csv',...
+                        iterateTx-1, iterateRx-1,...
+                        iterateOrderOfReflection, iterateTimeDivision-1);
+                    csvwrite(fullfile(mpcCoordinatesPath, filename),...
                         rayVertices(:, 2:end));
+
                 end
                 
                 if size(output) > 0
