@@ -25,34 +25,20 @@
 !src/custom_scenarios/
 src/custom_scenarios/*
 
-!src/custom_scenarios/NistCallJanuaryIndoor1/
-src/custom_scenarios/NistCallJanuaryIndoor1/*
-!src/custom_scenarios/NistCallJanuaryIndoor1/Input/
-!src/custom_scenarios/NistCallJanuaryIndoor1/runTimeTable*.mat
+!src/custom_scenarios/Journal1Lroom/
+src/custom_scenarios/Journal1Lroom/*
+!src/custom_scenarios/Journal1Lroom/Input/
+!src/custom_scenarios/Journal1Lroom/runTimeTable*.mat
 
-!src/custom_scenarios/NistCallJanuaryInterference/
-src/custom_scenarios/NistCallJanuaryInterference/*
-!src/custom_scenarios/NistCallJanuaryInterference/Input/
-!src/custom_scenarios/NistCallJanuaryInterference/runTimeTable*.mat
+!src/custom_scenarios/Journal1Indoor1/
+src/custom_scenarios/Journal1Indoor1/*
+!src/custom_scenarios/Journal1Indoor1/Input/
+!src/custom_scenarios/Journal1Indoor1/runTimeTable*.mat
 
-!src/custom_scenarios/IwcmcLroom/
-src/custom_scenarios/IwcmcLroom/*
-!src/custom_scenarios/IwcmcLroom/Input/
-!src/custom_scenarios/IwcmcLroom/runTimeTable*.mat
-
-!src/custom_scenarios/IwcmcIndoor1/
-src/custom_scenarios/IwcmcIndoor1/*
-!src/custom_scenarios/IwcmcIndoor1/Input/
-!src/custom_scenarios/IwcmcIndoor1/runTimeTable*.mat
-
-!src/custom_scenarios/IwcmcParkingLot/
-src/custom_scenarios/IwcmcParkingLot/*
-!src/custom_scenarios/IwcmcParkingLot/Input/
-!src/custom_scenarios/IwcmcParkingLot/runTimeTable*.mat
-
-!src/custom_scenarios/ParkingLot/
-src/custom_scenarios/ParkingLot/*
-!src/custom_scenarios/ParkingLot/Input/
+!src/custom_scenarios/Journal1ParkingLot/
+src/custom_scenarios/Journal1ParkingLot/*
+!src/custom_scenarios/Journal1ParkingLot/Input/
+!src/custom_scenarios/Journal1ParkingLot/runTimeTable*.mat
 
 # Do NOT ignore QD traces generation and output processing scripts
 !/src/custom_scenarios/*.m
