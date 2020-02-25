@@ -1,12 +1,52 @@
-function updateScenario(app)
+function updateScenario(app, mainPath)
+%UPDATESCENARIO Prepare visualization of new scenario. Plots new
+%environment, read and load Output/ files.
+%
+%SEE ALSO: RAYSAPPPLOTROOM, SETUPTXSLIDER, SETUPRXSLIDER, UPDATETIMESTEP
 
-scenarioName = app.ScenarioDropdown.Value;
-app.scenarioName = scenarioName;
-app.UIAxes.Title.String = scenarioName;
 
-app.outputPath = sprintf('../statsScenarios/L-Room/%s/Output', scenarioName);
-app.visualizerPath = sprintf('../statsScenarios/L-Room/%s/Output/Visualizer', scenarioName);
-app.ns3Path = sprintf('../statsScenarios/L-Room/%s/Output/Ns3', scenarioName);
+% Copyright (c) 2020, University of Padova, Department of Information
+% Engineering, SIGNET lab.
+%
+% Licensed under the Apache License, Version 2.0 (the "License");
+% you may not use this file except in compliance with the License.
+% You may obtain a copy of the License at
+%
+%    http://www.apache.org/licenses/LICENSE-2.0
+%
+% Unless required by applicable law or agreed to in writing, software
+% distributed under the License is distributed on an "AS IS" BASIS,
+% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+% See the License for the specific language governing permissions and
+% limitations under the License.
+
+if nargin < 2
+    mainPath = uigetdir(app.srcPath);
+end
+
+if mainPath == 0
+    return
+end
+
+scenarioName = getScenarioNameFromPath(mainPath, true);
+if strcmp(scenarioName, '')
+    uialert(app.Visualizer,...
+        'Selected path is not a valid scenario to be visualized',...
+        'Invalid path')
+    return
+else
+    app.scenarioName = scenarioName;
+end
+
+if strcmp(app.UIAxes.Title.Interpreter, 'latex')
+    app.UIAxes.Title.String = strrep(scenarioName, '_', '\_');
+else
+    app.UIAxes.Title.String = scenarioName;
+end
+
+app.outputPath = fullfile(mainPath,'Output');
+app.visualizerPath = fullfile(app.outputPath,'Visualizer');
+app.ns3Path = fullfile(app.outputPath,'Ns3');
 
 raysAppPlotRoom(app)
 
@@ -49,7 +89,7 @@ extractMpcCoordinatesInfo(app);
 extractNodePositionsInfo(app);
 
 totalTimesteps = length(app.timestepInfo);
-app.currentTimestep = 1;
+app.currentTimestep = 1; % added listener to this variable 
 
 if totalTimesteps < 2
     app.TimestepSlider.Limits = [0,1];
