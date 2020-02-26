@@ -5,12 +5,12 @@ clc
 addpath('..') % add src folder to path
 
 %% Parameters
-campaign = "NistCallJanuaryInterference";
+campaign = "Journal1ParkingLot";
 
 reflList = [1, 2, 3];
-switchQdList = [0, 1];
+switchQdList = [0];
 relThList = [-Inf, -40, -25, -15];
-floorList = ["Metal", "Ceiling"];
+floorList = ["Ceiling"];
 
 %% Loop over all combinations of parameters
 tableVarNames = {'totalNumberOfReflections', 'switchQDGenerator',...
@@ -29,7 +29,10 @@ for refl = reflList
                 scanarioPath = fullfile(pwd, campaign, scenarioName);
                 
                 try
-                    rmdir(scanarioPath, 's')
+                    [status, message, messageid] = rmdir(scanarioPath, 's');
+                    if ~status
+                        warning('%s: %s', messageid, message)
+                    end
                 catch
                 end
                 mkdir(scanarioPath)
@@ -41,7 +44,7 @@ for refl = reflList
                 updateCfgFile(cfgFilePath, 'switchQDGenerator', switchQd);
                 updateCfgFile(cfgFilePath, 'minRelativePathGainThreshold', relTh);
                 updateCfgFile(cfgFilePath, 'materialLibraryPath',...
-                    getMaterialLibraryPathFromFloorMaterial(scanarioPath, floorMaterial));
+                    getMaterialLibraryPathFromFloorMaterial(scanarioPath, floorMaterial, campaign));
                 
                 % run raytracer
                 t0 = tic;
@@ -73,24 +76,38 @@ if isnumeric(value)
     value = num2str(value);
 end
 
-cfgTable{parameterMask, 2} = {value};
-
-writetable(cfgTable, cfgFilePath, 'Delimiter', '\t');
+if strcmp(parameter, 'materialLibraryPath') && isempty(value)
+    % do nothing
+else
+    cfgTable{parameterMask, 2} = {value};
+    
+    writetable(cfgTable, cfgFilePath, 'Delimiter', '\t');
+end
 end
 
 
-function matLibPath = getMaterialLibraryPathFromFloorMaterial(scanarioPath, floorMaterial)
+function matLibPath = getMaterialLibraryPathFromFloorMaterial(scanarioPath, floorMaterial, campaign)
 paraCfg = parameterCfg(scanarioPath);
 matLibFolder = fileparts(paraCfg.materialLibraryPath);
 
-switch(floorMaterial)
-    case 'Metal'
-        matLibName = 'LectureRoomAllMaterialsMetalFloor.csv';
-    case 'Ceiling'
-        matLibName = 'LectureRoomAllMaterialsCeilingFloor.csv';
+switch(campaign)
+    case 'Journal1ParkingLot'
+        % do nothing
+        matLibPath = [];
+        
+    case {'Journal1Indoor1', 'Journal1Lroom'}
+        switch(floorMaterial)
+            case 'Metal'
+                matLibName = 'LectureRoomAllMaterialsMetalFloor.csv';
+            case 'Ceiling'
+                matLibName = 'LectureRoomAllMaterialsCeilingFloor.csv';
+            otherwise
+                error('Unknown floor material ''%s''', floorMaterial)
+        end
+        matLibPath = fullfile(matLibFolder, matLibName);
+        
     otherwise
-        error('Unknown floor material ''%s''', floorMaterial)
+        error('Campaign ''%s'' not recognized', campaign)
 end
 
-matLibPath = fullfile(matLibFolder, matLibName);
 end
