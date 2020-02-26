@@ -151,6 +151,15 @@ timeDivisionValue = paraCfgInput.totalTimeDuration / paraCfgInput.numberOfTimeDi
 % planes. If that occurs then the velocities are simply reversed (not
 % reflected). At every time step the positions of all nodes are updated
 for iterateTimeDivision = 1:paraCfgInput.numberOfTimeDivisions
+    if mod(iterateTimeDivision, 100) == 0
+        scenarioDetails = sprintf('refl=%d, qd=%d, relTh=%.0f, materialLibrary=%s',...
+                    paraCfgInput.totalNumberOfReflections,...
+                    paraCfgInput.switchQDGenerator,...
+                    paraCfgInput.minRelativePathGainThreshold,...
+                    paraCfgInput.materialLibraryPath);
+        fprintf('%6d/%6d %s\n', iterateTimeDivision, paraCfgInput.numberOfTimeDivisions, scenarioDetails)
+    end
+    
     % update mobility
     if paraCfgInput.mobilityType == 1
         if paraCfgInput.numberOfNodes == 2
