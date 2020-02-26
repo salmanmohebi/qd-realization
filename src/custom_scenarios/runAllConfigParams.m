@@ -12,6 +12,9 @@ switchQdList = [0];
 relThList = [-Inf, -40, -25, -15];
 floorList = ["Ceiling"];
 
+%% parfor setup
+parpool(4);
+
 %% Loop over all combinations of parameters
 tableVarNames = {'totalNumberOfReflections', 'switchQDGenerator',...
     'minRelativePathGainThreshold', 'floorMaterial', 'runTime'};
@@ -21,8 +24,14 @@ runTimeTable = table('Size',[0, length(tableVarNames)],...
 
 for refl = reflList
     for switchQd = switchQdList
-        for relTh = relThList
-            for floorMaterial = floorList
+        for floorMaterial = floorList
+            parfor relThIdx = 1:length(relThList)
+                relTh = relThList(relThIdx);
+                
+                partialunTimeTable = table('Size',[0, length(tableVarNames)],...
+                    'VariableTypes', ["double", "double", "double", "string", "double"],...
+                    'VariableNames', tableVarNames);
+                
                 % setup scenario folder
                 scenarioName = sprintf('refl%d_qd%d_relTh%.0f_floor%s',...
                     refl, switchQd, relTh, floorMaterial);
@@ -54,10 +63,10 @@ for refl = reflList
                 % save run time
                 tableRow = table(refl, switchQd, relTh, floorMaterial, runTime,...
                     'VariableNames', tableVarNames);
-                runTimeTable(end + 1, :) = tableRow;
-                
-                save(fullfile(campaign, 'runTimeTable'), 'runTimeTable')
+                partialRunTimeTable(relThIdx, :) = tableRow;
             end
+            runTimeTable = [runTimeTable; partialRunTimeTable];
+            save(fullfile(campaign, 'runTimeTable'), 'runTimeTable')
         end
     end
 end
