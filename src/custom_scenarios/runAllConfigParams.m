@@ -5,9 +5,9 @@ clc
 addpath('..') % add src folder to path
 
 %% Parameters
-campaign = "Journal1ParkingLot";
+campaign = "Journal1Indoor1";
 
-reflList = [1, 2, 3];
+reflList = [1, 2, 3, 4];
 switchQdList = [0];
 relThList = [-Inf, -40, -25, -15];
 floorList = ["Ceiling"];
