@@ -5,15 +5,15 @@ clc
 addpath('..') % add src folder to path
 
 %% Parameters
-campaign = "Journal1Indoor1";
+campaign = "Journal1GroundOnly";
 
-reflList = [1, 2, 3, 4];
+reflList = [1];
 switchQdList = [0];
-relThList = [-Inf, -40, -25, -15];
-floorList = ["Ceiling"];
+relThList = [-Inf];
+floorList = ["Metal", "Pec"];
 
 %% parfor setup
-parpool(4);
+% parpool(4);
 
 %% Loop over all combinations of parameters
 tableVarNames = {'totalNumberOfReflections', 'switchQDGenerator',...
@@ -25,7 +25,7 @@ runTimeTable = table('Size',[0, length(tableVarNames)],...
 for refl = reflList
     for switchQd = switchQdList
         for floorMaterial = floorList
-            parfor relThIdx = 1:length(relThList)
+            for relThIdx = 1:length(relThList)
                 relTh = relThList(relThIdx);
                 
                 partialunTimeTable = table('Size',[0, length(tableVarNames)],...
@@ -104,15 +104,8 @@ switch(campaign)
         % do nothing
         matLibPath = [];
         
-    case {'Journal1Indoor1', 'Journal1Lroom'}
-        switch(floorMaterial)
-            case 'Metal'
-                matLibName = 'LectureRoomAllMaterialsMetalFloor.csv';
-            case 'Ceiling'
-                matLibName = 'LectureRoomAllMaterialsCeilingFloor.csv';
-            otherwise
-                error('Unknown floor material ''%s''', floorMaterial)
-        end
+    case {'Journal1Indoor1', 'Journal1Lroom', 'Journal1GroundOnly'}
+        matLibName = sprintf('LectureRoomAllMaterials%sFloor.csv', floorMaterial);
         matLibPath = fullfile(matLibFolder, matLibName);
         
     otherwise

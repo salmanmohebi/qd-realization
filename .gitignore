@@ -40,5 +40,10 @@ src/custom_scenarios/Journal1ParkingLot/*
 !src/custom_scenarios/Journal1ParkingLot/Input/
 !src/custom_scenarios/Journal1ParkingLot/runTimeTable*.mat
 
+!src/custom_scenarios/Journal1GroundOnly/
+src/custom_scenarios/Journal1GroundOnly/*
+!src/custom_scenarios/Journal1GroundOnly/Input/
+!src/custom_scenarios/Journal1GroundOnly/runTimeTable*.mat
+
 # Do NOT ignore QD traces generation and output processing scripts
 !/src/custom_scenarios/*.m
