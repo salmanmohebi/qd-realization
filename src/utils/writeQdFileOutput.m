@@ -11,7 +11,7 @@ function writeQdFileOutput(output, useOptimizedOutputToFile,...
 % - qdFilesPath: path to Output/Ns3/QdFiles
 % - precision: floating point output precision in number of digits
 %
-% SEE ALSO: GETQDFILESIDS, CLOSEQDFILESIDS, MULTIPATH, LOSOUTPUTGENERATOR, PARAMETERCFG
+% SEE ALSO: GETOUTPUTFIDS, CLOSEOUTPUTFIDS, FILLOUTPUT, PARAMETERCFG
 
 
 % Copyright (c) 2019, University of Padova, Department of Information

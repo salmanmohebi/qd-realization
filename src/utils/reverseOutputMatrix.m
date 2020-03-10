@@ -1,4 +1,4 @@
-function outrev = reverseOutputTxRx(output)
+function outrev = reverseOutputMatrix(output)
 %REVERSEOUTPUTTXRX Function to reverse Tx and Rx columns from output.
 % Output format can be seen in LOSOutputGenerator or multipath functions.
 %
