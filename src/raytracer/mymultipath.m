@@ -1,4 +1,4 @@
-function [output, multipath] = mymultipath(rxPos, txPos, rxVel, txVel,...
+function [output, multipath, outTriangList] = mymultipath(rxPos, txPos, rxVel, txVel,...
     triangIdxList, cadData, visibilityMatrix, materialLibrary, switchQd,...
     switchMaterial, freq)
 %MYMULTIPATH Computes ray, if it exists, between rxPos and txPos, bouncing
@@ -30,6 +30,7 @@ if switchQd
 else
     % Only D-rays
     output = nan(triangListLen, 21);
+    outTriangList = cell(1, triangListLen);
 end
 multipath = nan(triangListLen, 1 + 3 * (reflOrder+2));
 
@@ -52,6 +53,7 @@ for i = 1:triangListLen
                 qdGenerator(deterministicRayOutput, arrayOfMaterials, materialLibrary)];
         else
             output(i,:) = deterministicRayOutput;
+            outTriangList{i} = currentTriangIdxs;
         end
         
         multipath(i,2:end) = rowMultipath;
@@ -62,5 +64,6 @@ end
 invalidRows = all(isnan(output), 2);
 output(invalidRows,:) = [];
 multipath(invalidRows,:) = [];
+outTriangList(invalidRows) = [];
 
 end
