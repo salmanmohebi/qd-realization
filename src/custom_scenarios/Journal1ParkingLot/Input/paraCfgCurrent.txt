@@ -19,3 +19,4 @@ useOptimizedOutputToFile	1
 minAbsolutePathGainThreshold	-Inf
 minRelativePathGainThreshold	-Inf
 materialLibraryPath	../material_libraries/ParkingLot_muRlOnly.csv
+writeTriangListFiles	1
