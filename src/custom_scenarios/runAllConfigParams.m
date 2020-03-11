@@ -66,7 +66,7 @@ for refl = reflList
                 partialRunTimeTable(relThIdx, :) = tableRow;
             end
             runTimeTable = [runTimeTable; partialRunTimeTable];
-            save(fullfile(campaign, 'runTimeTable'), 'runTimeTable')
+            save(fullfile(campaign, 'runTimeTable_triangList'), 'runTimeTable')
         end
     end
 end
