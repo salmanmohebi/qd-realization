@@ -1,18 +1,18 @@
-function fids = getQdFilesIds(qdFilesPath, numberOfNodes, useOptimizedOutputToFile)
-%GETQDFILESIDS Opens/creates all QdFiles with 'At' permission (create or
-% append to text file without automatic flushing).
+function fids = getOutputFids(folderpath, numberOfNodes, useOptimizedOutputToFile)
+%GETOUTPUTFIDS Opens/creates all output files with 'At' permission (create
+% or append to text file without automatic flushing).
 %
 % INPUTS:
-% - qdFilesPath: folder path to QdFiles
+% - folderpath: output folder path
 % - numberOfNodes: number of nodes in the simulation
 % - useOptimizedOutputToFile: flag. Disable if "Too many files open" error
-% is thrown.
+% is thrown. See PARAMETERCFG.
 %
 % OUTPUTS:
 % - fids: Empty array is ~useOptimizedOutputToFile. Otherwise, matrix of
 % File IDs. The main diagonal is NaN-filled.
 %
-% SEE ALSO: CLOSEQDFILESIDS, WRITEQDFILEOUTPUT
+% SEE ALSO: CLOSEQDFILESIDS, PARAMETERCFG
 
 
 % Copyright (c) 2019, University of Padova, Department of Information
@@ -43,7 +43,7 @@ else
             end
             
             filename = sprintf('Tx%dRx%d.txt', iTx-1, iRx-1);
-            filepath = fullfile(qdFilesPath, filename);
+            filepath = fullfile(folderpath, filename);
             
             fids(iTx,iRx) = fopen(filepath,'At');
         end

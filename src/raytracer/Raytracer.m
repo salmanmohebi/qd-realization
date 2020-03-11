@@ -82,6 +82,10 @@ outputPath = fullfile(paraCfgInput.inputScenarioName, 'Output');
 ns3Path = fullfile(outputPath, 'Ns3');
 qdFilesPath = fullfile(ns3Path, 'QdFiles');
 
+if paraCfgInput.writeTriangListFiles
+    triangListPath = fullfile(outputPath, 'TriangList');
+end
+
 if paraCfgInput.switchSaveVisualizerFiles == 1
     visualizerPath = fullfile(outputPath, 'Visualizer');
     
@@ -93,6 +97,10 @@ end
 % Subfolders creation
 if ~isfolder(qdFilesPath)
     mkdir(qdFilesPath)
+end
+
+if paraCfgInput.writeTriangListFiles && ~isfolder(triangListPath)
+    mkdir(triangListPath)
 end
 
 if paraCfgInput.switchSaveVisualizerFiles
@@ -110,8 +118,13 @@ if paraCfgInput.switchSaveVisualizerFiles
 end
 
 % Init output files
-fids = getQdFilesIds(qdFilesPath, paraCfgInput.numberOfNodes,...
+qdFilesFids = getOutputFids(qdFilesPath, paraCfgInput.numberOfNodes,...
     paraCfgInput.useOptimizedOutputToFile);
+
+if paraCfgInput.writeTriangListFiles
+    triangListFids = getOutputFids(triangListPath, paraCfgInput.numberOfNodes,...
+        paraCfgInput.useOptimizedOutputToFile);
+end
 
 %% Init
 Tx = nodeLoc(1,:);
@@ -191,7 +204,9 @@ for iterateTimeDivision = 1:paraCfgInput.numberOfTimeDivisions
             vtx = nodeVelocities(iterateTx, :);
             vrx = nodeVelocities(iterateRx, :);
             
-
+            % init triangList for given (timestep, node pair)
+            triangList = {};
+            
             % LOS Path generation
             [output, rayVertices] = computeLosOutput(Rx, Tx, vrx, vtx,...
                 CADop, paraCfgInput.carrierFrequency,...
@@ -212,33 +227,35 @@ for iterateTimeDivision = 1:paraCfgInput.numberOfTimeDivisions
                     iterateTx-1, iterateRx-1, 0, iterateTimeDivision-1);
                 csvwrite(fullfile(mpcCoordinatesPath, filename),...
                     rayVertices);
-
-            end
+                % LoS ray does not interact with any triangle
+                triangList{1} = NaN;
                 
+            end
+            
             % Higher order reflections (Non LOS)
             triangReflIdxList = [];
             for iterateOrderOfReflection = 1:paraCfgInput.totalNumberOfReflections
                 triangReflIdxList = generateReflectionList(...
                     triangReflIdxList, CADop, visibilityMatrix);
                 
-                [outputTmp, rayVertices, currentMaxPathGain] = mymultipath(...
+                [outputTmp, rayVertices, currentMaxPathGain, triangListTmp] = mymultipath(...
                     Rx, Tx, vrx, vtx, triangReflIdxList, CADop,...
                     visibilityMatrix, MaterialLibrary,...
                     paraCfgInput.switchQDGenerator, switchMaterial,...
                     paraCfgInput.carrierFrequency,...
                     paraCfgInput.minAbsolutePathGainThreshold,...
                     paraCfgInput.minRelativePathGainThreshold, currentMaxPathGain);
-                        
+                
                 if paraCfgInput.switchSaveVisualizerFiles &&...
                         iterateTx < iterateRx &&...
                         size(rayVertices, 1) ~= 0
-
+                    
                     filename = sprintf('MpcTx%dRx%dRefl%dTrc%d.csv',...
                         iterateTx-1, iterateRx-1,...
                         iterateOrderOfReflection, iterateTimeDivision-1);
                     csvwrite(fullfile(mpcCoordinatesPath, filename),...
                         rayVertices(:, 2:end));
-
+                    
                 end
                 
                 if size(output) > 0
@@ -246,7 +263,9 @@ for iterateTimeDivision = 1:paraCfgInput.numberOfTimeDivisions
                 elseif size(outputTmp) > 0
                     output = outputTmp;
                 end
-                                     
+                
+                triangList = [triangList, triangListTmp];
+                
             end
             
             % Clean up reflections with path gain lower than
@@ -264,18 +283,32 @@ for iterateTimeDivision = 1:paraCfgInput.numberOfTimeDivisions
             % between ith node as Tx and jth as Rx.
             writeQdFileOutput(output,...
                 paraCfgInput.useOptimizedOutputToFile,...
-                fids, iterateTx, iterateRx, qdFilesPath,...
+                qdFilesFids, iterateTx, iterateRx, qdFilesPath,...
                 paraCfgInput.qdFilesFloatPrecision);
-            writeQdFileOutput(reverseOutputTxRx(output),...
+            writeQdFileOutput(reverseOutputMatrix(output),...
                 paraCfgInput.useOptimizedOutputToFile,...
-                fids, iterateRx, iterateTx, qdFilesPath,...
+                qdFilesFids, iterateRx, iterateTx, qdFilesPath,...
                 paraCfgInput.qdFilesFloatPrecision);
-
+            
+            if paraCfgInput.writeTriangListFiles
+                % Write triangList to file for the given (timestep, node pair)
+                writeTriangList(triangList,...
+                    paraCfgInput.useOptimizedOutputToFile,...
+                    triangListFids, iterateTx, iterateRx, triangListPath);
+                writeTriangList(reverseOutputTriangList(triangList),...
+                    paraCfgInput.useOptimizedOutputToFile,...
+                    triangListFids, iterateRx, iterateTx, triangListPath);
+            end
+            
         end
     end
     
 end
 
-closeQdFilesIds(fids, paraCfgInput.useOptimizedOutputToFile);
+closeOutputFids(qdFilesFids, paraCfgInput.useOptimizedOutputToFile);
+
+if paraCfgInput.writeTriangListFiles
+    closeOutputFids(triangListFids, paraCfgInput.useOptimizedOutputToFile);
+end
 
 end

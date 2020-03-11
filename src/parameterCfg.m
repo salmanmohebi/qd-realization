@@ -150,6 +150,12 @@ para = fieldToNum(para, 'minRelativePathGainThreshold', [], -Inf);
 assert(isfield(para, 'materialLibraryPath'),...
     'Need path to material library')
 
+% Write files containing the lists of triangle indexes (relative to the
+% imported CAD file of the scenario) from which each ray of each timestep
+% of each Tx/Rx pair was reflected from
+% Default: 0 (false)
+para = fieldToNum(para, 'writeTriangListFiles', [], 0);
+
 end
 
 
