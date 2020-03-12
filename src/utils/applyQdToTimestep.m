@@ -18,9 +18,8 @@ for i = 1:qdFileIn.numRays
         'aodAz', qdFileIn.aodAz(i),...
         'aodEl', qdFileIn.aodEl(i),...
         'aoaAz', qdFileIn.aoaAz(i),...
-        'aoaEl', qdFileIn.aoaEl(i));
-    % need to know whether a ray is LoS or reflected
-    [rayInfo, triangList{i}] = addReflOrder(rayInfo, triangList{i});
+        'aoaEl', qdFileIn.aoaEl(i),...
+        'reflOrder', length(triangList{i}));
     
     qdArray = fillOutputRayInfo(rayInfo);
     
@@ -44,17 +43,6 @@ end
 
 
 %% UTILS
-function [rayInfo, triangList] = addReflOrder(rayInfo, triangList)
-if isscalar(triangList) && isnan(triangList)
-    % LoS is encoded with scalar NaN value
-    triangList = [];
-end
-
-rayInfo.reflOrder = length(triangList);
-
-end
-
-
 function intersectTriangIdx = findIntersectedTriang(cadData, visibilityMatrix, nodePos, direction)
 
 for triangIdx = 1:size(cadData, 1)
