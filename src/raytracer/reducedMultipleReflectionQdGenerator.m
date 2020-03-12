@@ -35,7 +35,7 @@ for matIdx = 1:totMaterials
         losDelay, minPgThreshold);
     
     outputPre = [outputPre; otherMaterialsRl(currentOutputPre, otherMaterials, materialLibrary)];
-    outputPost= [outputPost; otherMaterialsRl(currentOutputPost, otherMaterials, materialLibrary)];
+    outputPost = [outputPost; otherMaterialsRl(currentOutputPost, otherMaterials, materialLibrary)];
 end
 
 output = [outputPre; cursorOutput; outputPost];
@@ -43,7 +43,11 @@ end
 
 
 %% UTILS
-function otherMaterialsRl(diffusedRays, otherMaterials, materialLibrary)
+function diffusedRays = otherMaterialsRl(diffusedRays, otherMaterials, materialLibrary)
+
+if isempty(diffusedRays)
+    return
+end
 
 nRays = size(diffusedRays, 1);
 totRl = zeros(nRays, 1); % already subtracts mean RL
