@@ -1,4 +1,5 @@
-function qdFileOut = applyQdToTimestep(qdFileIn, triangList, nodesPosition, cadData, materialLibrary, paramCfg)
+function qdFileOut = applyQdToTimestep(qdFileIn, triangList,...
+    nodesPosition, cadData, materialLibrary, paramCfg)
 % extract time-step information
 % LoS delay
 nodesDistance = nodesPosition{2} - nodesPosition{1};
@@ -26,7 +27,8 @@ for i = 1:qdFileIn.numRays
     if rayInfo.reflOrder > 0
         % Reflected ray: generate QD
         arrayOfMaterials = cadData(triangList{i}, 14);
-        qdArray = reducedMultipleReflectionQdGenerator(qdArray, arrayOfMaterials, materialLibrary, losDelay, minPgThreshold);
+        qdArray = reducedMultipleReflectionQdGenerator(...
+            qdArray, arrayOfMaterials, materialLibrary, losDelay, minPgThreshold);
     end
     
     % Add new rays
@@ -43,29 +45,6 @@ end
 
 
 %% UTILS
-function intersectTriangIdx = findIntersectedTriang(cadData, visibilityMatrix, nodePos, direction)
-
-for triangIdx = 1:size(cadData, 1)
-    a = cadData(triangIdx, 1:3);
-    b = cadData(triangIdx, 4:6);
-    c = cadData(triangIdx, 7:9);
-    planeEq = cadData(triangIdx, 10:13);
-    
-    intersection = planeIntersectsHalfLine(planeEq, nodePos, direction, false);
-    if ~isempty(intersection) &&... % intersecting the plane in the right direction
-            pointInTriangle(intersection, a, b, c) &&... % intersecting the triangle
-            ~isRayObstructed(nodePos, intersection, cadData, visibilityMatrix, triangIdx)
-        
-        intersectTriangIdx = triangIdx;
-        return
-    end
-end
-
-error('No valid intersecting triangle found')
-
-end
-
-
 function qStruct = qdArray2Struct(qdArray)
 qStruct = struct('numRays', size(qdArray, 1),...
         'pathGain', qdArray(:, 9),...

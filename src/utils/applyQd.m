@@ -1,4 +1,6 @@
-function qdFilesOut = applyQd(qdFilesIn, triangLists, nodesPosition, cadData, materialLibrary, paramCfg)
+function qdFilesOut = applyQd(qdFilesIn, triangLists, nodesPosition,...
+    cadData, materialLibrary, paramCfg)
+
 numNodes = length(nodesPosition);
 assert(size(qdFilesIn, 1) == numNodes && size(qdFilesIn, 2) == numNodes);
 
@@ -12,11 +14,13 @@ for nodeIdx1 = 1:numNodes
         
         tTot = length(qdFile);
         assert(length(triangList) == tTot);
-        assert(length(positions{1}) == tTot+1 && length(positions{2}) == tTot+1); %% fix "+1"
-        
+        assert(length(positions{1}) == tTot+1 &&...
+            length(positions{2}) == tTot+1);
         
         for t = 1:tTot
-            qdFileOut(t) = applyQdToTimestep(qdFile(t), triangList{t}, {positions{1}(t, :), positions{2}(t, :)}, cadData, materialLibrary, paramCfg);
+            qdFileOut(t) = applyQdToTimestep(qdFile(t), triangList{t},...
+                {positions{1}(t, :), positions{2}(t, :)}, cadData,...
+                materialLibrary, paramCfg);
         end
         
         % store QD files

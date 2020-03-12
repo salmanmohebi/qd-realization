@@ -32,7 +32,8 @@ materialLibrary = importMaterialLibrary(matLibraryPath);
 
 %% post-processing
 if switchMaterial
-    qdFilesOut = applyQd(qdFiles, triangLists, nodesPosition, cadData, materialLibrary, paramCfg);
+    qdFilesOut = applyQd(qdFiles, triangLists, nodesPosition, cadData,...
+        materialLibrary, paramCfg);
 end
 
 %% write to file
