@@ -97,7 +97,7 @@ pg = pg0db - Kdb + 10*log10(exp(1)) * (-abs(taus - tau0)/gamma + s);
 
 % Remove MPCs with more power than main cursor or below minimum path gain
 % thresholds
-removeMpcMask = pg >= pg0db & pg < minPgThreshold;
+removeMpcMask = pg >= pg0db | pg < minPgThreshold;
 taus(removeMpcMask) = [];
 pg(removeMpcMask) = [];
 params.nRays = length(taus);
