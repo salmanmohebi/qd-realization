@@ -30,6 +30,8 @@ for i = 1:qdFileIn.numRays
         qdArray = qdGeneratorFunc(qdArray, arrayOfMaterials,...
             materialLibrary, losDelay, minPgThreshold);
     end
+%     figure
+%     scatter(qdArray(:,8), qdArray(:,9))
     
     % Add new rays
     numMpcs = size(qdArray, 1);
@@ -40,6 +42,27 @@ end
 
 qdArrayOut = qdArrayOut(1:qdOutLastIdx, :);
 qdFileOut = qdArray2Struct(qdArrayOut);
+
+% % sanity-check plot
+% maxPg = max(qdFileOut.pathGain);
+% minPg = maxPg - 50;
+% scalePg = @(pg) max(0, 50*(pg - minPg)/(maxPg - minPg)) + 0.01;
+% 
+% figure
+% scatter(qdFileOut.aodAz, qdFileOut.aodEl, scalePg(qdFileOut.pathGain)); hold on
+% scatter(qdFileIn.aodAz, qdFileIn.aodEl, scalePg(qdFileIn.pathGain));hold off
+% xlim([0 360])
+% ylim([0 180])
+% title('AoD')
+% set(gca, 'YDir', 'reverse')
+% 
+% figure
+% scatter(qdFileOut.aoaAz, qdFileOut.aoaEl, scalePg(qdFileOut.pathGain)); hold on
+% scatter(qdFileIn.aoaAz, qdFileIn.aoaEl, scalePg(qdFileIn.pathGain));hold off
+% xlim([0 360])
+% ylim([0 180])
+% title('AoA')
+% set(gca, 'YDir', 'reverse')
 
 end
 
