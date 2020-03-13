@@ -18,12 +18,17 @@ if isempty(triangList)
 end
 
 for i = 1:numRays
-    list = triangList{i};
+    currentTriangList = triangList{i};
     
-    if length(list) > 1
-        fprintf(fid, '%d,', list(1:end-1));
+    switch(length(currentTriangList))
+        case 0
+            fprintf(fid, '\n');
+        case 1
+            fprintf(fid, '%d\n', currentTriangList);
+        otherwise
+            fprintf(fid, '%d,', currentTriangList(1:end-1));
+            fprintf(fid, '%d\n', currentTriangList(end));
     end
-    fprintf(fid, '%d\n', list(end));
     
 end
 
