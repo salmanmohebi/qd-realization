@@ -228,7 +228,7 @@ for iterateTimeDivision = 1:paraCfgInput.numberOfTimeDivisions
                 csvwrite(fullfile(mpcCoordinatesPath, filename),...
                     rayVertices);
                 % LoS ray does not interact with any triangle
-                triangList{1} = NaN;
+                triangList{1} = [];
                 
             end
             
