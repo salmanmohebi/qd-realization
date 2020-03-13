@@ -6,7 +6,9 @@ nodesDistance = nodesPosition{2} - nodesPosition{1};
 losDelay = norm(nodesDistance) / physconst('LightSpeed');
 
 % Threshold for minimum path gain
-minPgThreshold = -Inf;
+maxPathGain = max(qdFileIn.pathGain);
+minPgThreshold = max(maxPathGain + paramCfg.minRelativePathGainThreshold,...
+    paramCfg.minAbsolutePathGainThreshold);
 
 % init
 qdArrayOut = nan(qdFileIn.numRays * 20, 21);
