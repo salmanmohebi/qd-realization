@@ -21,6 +21,11 @@ function output = fillOutputQd(delay, pathGain, aodAz, aodEl,...
 % See the License for the specific language governing permissions and
 % limitations under the License.
 
+if isempty(delay)
+    output = [];
+    return
+end
+
 nOut = size(delay, 1);
 
 % Compute missing outputs
