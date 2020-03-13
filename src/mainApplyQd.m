@@ -5,6 +5,7 @@
 addpath('utils', 'raytracer')
 %%
 scenario = 'ScenarioTest';
+qdGeneratorFunc = @completeMultipleReflectionQdGenerator;
 
 % Import Output files
 qdFiles = readAllQdFiles(scenario);
@@ -33,7 +34,7 @@ materialLibrary = importMaterialLibrary(matLibraryPath);
 %% post-processing
 if switchMaterial
     qdFilesOut = applyQd(qdFiles, triangLists, nodesPosition, cadData,...
-        materialLibrary, paramCfg);
+        materialLibrary, paramCfg, qdGeneratorFunc);
 end
 
 %% write to file

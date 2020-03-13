@@ -1,5 +1,5 @@
 function qdFileOut = applyQdToTimestep(qdFileIn, triangList,...
-    nodesPosition, cadData, materialLibrary, paramCfg)
+    nodesPosition, cadData, materialLibrary, paramCfg, qdGeneratorFunc)
 % extract time-step information
 % LoS delay
 nodesDistance = nodesPosition{2} - nodesPosition{1};
@@ -27,8 +27,8 @@ for i = 1:qdFileIn.numRays
     if rayInfo.reflOrder > 0
         % Reflected ray: generate QD
         arrayOfMaterials = cadData(triangList{i}, 14);
-        qdArray = reducedMultipleReflectionQdGenerator(...
-            qdArray, arrayOfMaterials, materialLibrary, losDelay, minPgThreshold);
+        qdArray = qdGeneratorFunc(qdArray, arrayOfMaterials,...
+            materialLibrary, losDelay, minPgThreshold);
     end
     
     % Add new rays
